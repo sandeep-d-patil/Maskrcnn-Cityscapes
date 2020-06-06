@@ -11,9 +11,11 @@ from abstract import AbstractDataset
 
 
 class CityscapesDataset(AbstractDataset):
-    def __init__(self, root, transforms=None):
+    def __init__(self, root, transforms=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.root = root
         self.transforms = transforms
+
         # load all image files, sorting them to
         # ensure that they are aligned
         img_dir= "/mnt/hgfs/cityscapes/datasets/cityscapes/leftImg8bit/"
@@ -30,13 +32,14 @@ class CityscapesDataset(AbstractDataset):
 
         ann_pattern = os.path.join(ann_dir, "*", "*_instanceIds.png")
         ann_paths = sorted(glob.glob(ann_pattern))
-        self.img_paths = img_paths
-        self.ann_paths = ann_paths
+        self.img_paths = list(img_paths)
+        self.ann_paths = list(ann_paths)
         print(self.ann_paths)
 
         self.split = split
         self.CLASSES = ["__background__"]
         self.CLASSES += [l.name for l in csHelpers.labels if l.hasInstances]
+
         self.initMaps()
 
         self.cityscapesID_to_ind = {
@@ -104,11 +107,13 @@ class CityscapesDataset(AbstractDataset):
             label = self.cityscapesID_to_ind[label]
             labels.append(label)
 
+        labels = torch.as_tensor(labels, dtype=torch.float32)
+
         image_id = torch.tensor([idx])
         area = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0])
 
 
-        # # suppose all instances are not crowd
+        # suppose all instances are not crowd
         iscrowd = torch.zeros((num_objs,), dtype=torch.int64)
         #
         target = {}
@@ -116,16 +121,16 @@ class CityscapesDataset(AbstractDataset):
         target["labels"] = labels
         target["masks"] = masks
         target["image_id"] = image_id
-        # target["area"] = area
+        target["area"] = area
         target["iscrowd"] = iscrowd
         #
-        # if self.transforms is not None:
-        #     img, target = self.transforms(img, target)
+        if self.transforms is not None:
+            img, target = self.transforms(img, target)
         #
         return img, target
 
     def __len__(self):
-        return len(self.imgs)
+        return len(self.img_paths)
 
     def get_img_info(self, index):
         # Reverse engineered from voc.py
