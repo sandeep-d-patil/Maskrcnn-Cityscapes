@@ -62,7 +62,7 @@ data_loader = torch.utils.data.DataLoader(
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
 # our dataset has two classes only - background and person
-num_classes = 2
+num_classes = 34
 
 # get the model using our helper function
 model = get_instance_segmentation_model(num_classes)
