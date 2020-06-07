@@ -107,7 +107,7 @@ class CityscapesDataset(AbstractDataset):
             label = self.cityscapesID_to_ind[label]
             labels.append(label)
 
-        labels = torch.as_tensor(labels, dtype=torch.float32)
+        labels = torch.as_tensor(labels, dtype=torch.int64)
 
         image_id = torch.tensor([idx])
         area = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0])
