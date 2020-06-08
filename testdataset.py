@@ -50,67 +50,68 @@ class CityscapesDataset(AbstractDataset):
         # load images ad masks
         img_path = self.img_paths[idx]
         mask_path = self.ann_paths[idx]
-        # img_path = os.path.join(self.root, "PNGImages", self.imgs[idx])
-        # mask_path = os.path.join(self.root, "PedMasks", self.masks[idx])
         img = Image.open(img_path).convert("RGB")
         # note that we haven't converted the mask to RGB,
         # because each color corresponds to a different instance
         # with 0 being background
-        mask = Image.open(mask_path)
+        ann = Image.open(mask_path)
         # plt.imshow(mask)
         # plt.show()
 
-        mask = np.array(mask)
+        ann_numpy = np.array(ann)  # ann numpy
+        ann = torch.from_numpy(ann_numpy)  # ann torch
 
-        # dataset = CityscapesDataset('/')
-        # instances are encoded as different colors
-        obj_ids = np.unique(mask)
-        # print("obj_ids", obj_ids)
-        # first id is the background, so remove it
-        obj_ids = obj_ids[1:]
-        # print("obj_ids_withoutbackground", obj_ids)
-        #
-        # split the color-encoded mask into a set
-        # of binary masks
-        masks = mask == obj_ids[:, None, None]
-
-        # get bounding box coordinates for each mask
-        num_objs = len(obj_ids)
         boxes = []
-        for i in range(num_objs):
-            pos = np.where(masks[i])
-            xmin = np.min(pos[1])
-            xmax = np.max(pos[1])
-            ymin = np.min(pos[0])
-            ymax = np.max(pos[0])
-            boxes.append([xmin, ymin, xmax, ymax])
-        #
-        boxes = torch.as_tensor(boxes, dtype=torch.float32)
-        # print("box", boxes)
-        # print("box shape", boxes.shape)
-        # there is only one class
-        # labels = torch.ones((num_objs,), dtype=torch.int64)
         labels = []
-        masks = torch.as_tensor(masks, dtype=torch.uint8)
+        masks = []
 
         self.cityscapesID_to_ind = {
             l.id: self.name_to_id[l.name] for l in csHelpers.labels if l.hasInstances
         }
-        instIds = torch.sort(torch.unique(torch.from_numpy(mask)))[0]
+
+        instIds = torch.sort(torch.unique(ann))[0]
+        # print("instIds", instIds)
         for instId in instIds:
-            if instId < 10000:  # group labels
+            if instId < 1000:  # group labels
                 continue
 
-        # masks = masks == instId
+            mask = ann == instId
+
             label = int(instId // 1000)
             label = self.cityscapesID_to_ind[label]
-            labels.append(label)
 
+            a = mask.nonzero()
+            bbox = [
+                torch.min(a[:, 1]),
+                torch.min(a[:, 0]),
+                torch.max(a[:, 1]),
+                torch.max(a[:, 0]),
+            ]
+            bbox = list(map(int, bbox))
+
+            labels.append(label)
+            # masks.append(mask)
+            boxes.append(bbox)
+
+        # instances are encoded as different colors
+        obj_ids = np.unique(ann_numpy)
+
+        # only keep relevant objects
+        obj_ids = np.array([ids for ids in obj_ids if ids >= 1000])
+
+        # split the color-encoded mask into a set
+        # of binary masks
+        masks = ann_numpy == obj_ids[:, None, None]
         labels = torch.as_tensor(labels, dtype=torch.int64)
-        print("labels", labels.shape)
+        boxes = torch.as_tensor(boxes, dtype=torch.float32)
+        masks = torch.as_tensor(masks, dtype=torch.uint8)
+        # print("box", boxes)
+        # print("box shape", boxes.shape)
+
+        # print("labels", labels.shape)
 
         image_id = torch.tensor([idx])
-        area = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0])
+        # area = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0])
 
         # suppose all instances are not crowd
         # iscrowd = torch.zeros((num_objs,), dtype=torch.int64)
@@ -120,13 +121,14 @@ class CityscapesDataset(AbstractDataset):
         target["labels"] = labels
         target["masks"] = masks
         target["image_id"] = image_id
-        print("labels shape", labels.shape)
-        print("masks shape", masks.shape)
-        print("image_id shape", image_id.shape)
-        print("boxes shape", boxes)
-        target["area"] = area
+        # print("labels shape", labels.shape)
+        # print("masks shape", masks.shape)
+        # print("image_id shape", image_id.shape)
+        # print("boxes shape", boxes.shape)
+        # target["area"] = area
         # target["iscrowd"] = iscrowd
-        print("area shape", area.shape)
+        # print("area shape", area.shape)
+        #
         if self.transforms is not None:
             img, target = self.transforms(img, target)
         #
@@ -143,5 +145,5 @@ class CityscapesDataset(AbstractDataset):
 # mask = Image.open('/mnt/hgfs/cityscapes/datasets/cityscapes/gtFine_trainvaltest/gtFine/')
 
 
-dataset = CityscapesDataset('/',split="train")
-dataset[0]
+# dataset = CityscapesDataset('/', split="train")
+# dataset[0]

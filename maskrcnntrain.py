@@ -5,7 +5,7 @@ from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 from torchvision.models.detection.mask_rcnn import MaskRCNNPredictor
 from engine import train_one_epoch, evaluate
 import utils
-from cityscapesdataset import CityscapesDataset
+from finaldatasetclass import CityscapesDataset
 import transforms as T
 
 def get_transform(train):
@@ -40,29 +40,29 @@ def get_instance_segmentation_model(num_classes):
 
 
 # use our dataset and defined transformations
-dataset = CityscapesDataset('/', get_transform(train=True))
-# dataset_test = CityscapesDataset('/', get_transform(train=False))
+dataset = CityscapesDataset('/', "train",get_transform(train=False))
+dataset_test = CityscapesDataset('/',"test", get_transform(train=False))
 
 # split the dataset in train and test set
 torch.manual_seed(1)
 indices = torch.randperm(len(dataset)).tolist()
 dataset = torch.utils.data.Subset(dataset, indices[-50:])
-# dataset_test = torch.utils.data.Subset(dataset_test, indices[-50:])
+dataset_test = torch.utils.data.Subset(dataset_test, indices[-50:])
 
 # define training and validation data loaders
 data_loader = torch.utils.data.DataLoader(
     dataset, batch_size=2, shuffle=True, num_workers=4,
     collate_fn=utils.collate_fn)
 
-# data_loader_test = torch.utils.data.DataLoader(
-#     dataset_test, batch_size=1, shuffle=False, num_workers=4,
-#     collate_fn=utils.collate_fn)
+data_loader_test = torch.utils.data.DataLoader(
+    dataset_test, batch_size=2, shuffle=False, num_workers=4,
+    collate_fn=utils.collate_fn)
 
 
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
 # our dataset has two classes only - background and person
-num_classes = 34
+num_classes = 10
 
 # get the model using our helper function
 model = get_instance_segmentation_model(num_classes)
@@ -71,7 +71,7 @@ model.to(device)
 
 # construct an optimizer
 params = [p for p in model.parameters() if p.requires_grad]
-optimizer = torch.optim.SGD(params, lr=0.005,
+optimizer = torch.optim.SGD(params, lr=0.0005,
                             momentum=0.9, weight_decay=0.0005)
 
 # and a learning rate scheduler which decreases the learning rate by
@@ -82,7 +82,7 @@ lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer,
 
 
 # let's train it for 10 epochs
-num_epochs = 1
+num_epochs = 2
 
 for epoch in range(num_epochs):
     # train for one epoch, printing every 10 iterations
@@ -90,4 +90,4 @@ for epoch in range(num_epochs):
     # update the learning rate
     lr_scheduler.step()
     # evaluate on the test dataset
-#     evaluate(model, data_loader_test, device=device)
+    evaluate(model, data_loader_test, device=device)
