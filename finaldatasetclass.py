@@ -49,8 +49,8 @@ class CityscapesDataset(AbstractDataset):
         img_path = self.img_paths[idx]
         mask_path = self.ann_paths[idx]
         img = Image.open(img_path).convert("RGB")
-        # print("imag_path", img_path)
-        # print("idx", idx)
+        print("imag_path", img_path)
+        print("idx", idx)
         # note that we haven't converted the mask to RGB,
         # because each color corresponds to a different instance
         # with 0 being background

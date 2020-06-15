@@ -8,6 +8,7 @@ from engine import train_one_epoch, evaluate
 import utils
 from finaldatasetclass import CityscapesDataset
 import transforms as T
+from PIL import Image
 
 def get_transform(train):
     transforms = []
@@ -41,7 +42,7 @@ def get_instance_segmentation_model(num_classes):
 
 
 # use our dataset and defined transformations
-dataset = CityscapesDataset('/', "train", get_transform(train=False))
+dataset = CityscapesDataset('/', "train", get_transform(train=True))
 dataset_test = CityscapesDataset('/', "val", get_transform(train=False))
 
 # split the dataset in train and test set
@@ -87,7 +88,7 @@ lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer,
 
 
 # let's train it for 10 epochs
-num_epochs = 1
+num_epochs = 5
 
 for epoch in range(num_epochs):
     # train for one epoch, printing every 10 iterations
@@ -96,3 +97,24 @@ for epoch in range(num_epochs):
     lr_scheduler.step()
     # evaluate on the test dataset
     evaluate(model, data_loader_test, device=device)
+
+
+# pick one image from the test set
+img, _ = dataset_test[1]
+# put the model in evaluation mode
+model.eval()
+with torch.no_grad():
+    prediction = model([img.to(device)])
+
+plt.imshow(img.mul(255).permute(1, 2, 0).byte().numpy())
+# im1.show()
+plt.savefig("mygraph.png")
+
+plt.imshow(prediction[0]['masks'][0, 0].mul(255).byte().cpu().numpy())
+plt.savefig("mygraph1.png")
+
+torch.save(model.state_dict(), "/home/sandeep/Downloads/cityscapes/checkpoint1.pth")
+
+checkpoint = torch.load("/home/sandeep/Downloads/cityscapes/checkpoint1.pth")
+
+model.load_state_dict(checkpoint)

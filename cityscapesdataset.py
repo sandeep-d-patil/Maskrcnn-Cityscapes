@@ -143,5 +143,5 @@ class CityscapesDataset(AbstractDataset):
 # mask = Image.open('/mnt/hgfs/cityscapes/datasets/cityscapes/gtFine_trainvaltest/gtFine/')
 
 
-dataset = CityscapesDataset('/',split="train")
-dataset[0]
+# dataset = CityscapesDataset('/',split="train")
+# dataset[0]
