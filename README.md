@@ -28,9 +28,9 @@ Data-preprocessing must be done to obtain label ids, which must be filtered out 
  ## **Model Description**
 
 
-Mask RCNN is a state of the art deep neural network which solves instance segmentation. There are two main parts of the neural network which are backbone and head, the back bone architecture extracts features from the input images. The backbone for Mask RCNN are ResNet 50, FPN or ResNext 101 [CITE]. The features of the backbone are taken as input in the head , which contains two stages. In the first stage RPN or Region Proposal network scans the output of the backbone layer and it proposes anchor boxes which are bounding boxes with predefined locations and scales relative to images. At the second stage, the neural network scans these region proposed areas and generates object classes, bounding boxes and masks. This stage is called ROI Align. [LINK]
+Mask RCNN is a state of the art deep neural network which solves instance segmentation. There are two main parts of the neural network which are backbone and head, the back bone architecture extracts features from the input images. The backbone for Mask RCNN are ResNet 50, FPN or ResNext 101 [[Kaiming et al.](https://arxiv.org/pdf/1703.06870.pdf)]. The features of the backbone are taken as input in the head , which contains two stages. In the first stage RPN or Region Proposal network scans the output of the backbone layer and it proposes anchor boxes which are bounding boxes with predefined locations and scales relative to images. At the second stage, the neural network scans these region proposed areas and generates object classes, bounding boxes and masks. This stage is called ROI Align. [[LINK](https://medium.com/@alittlepain833/simple-understanding-of-mask-rcnn-134b5b330e95#:~:text=Mask%20RCNN%20is%20a%20deep,two%20stages%20of%20Mask%20RCNN.)]
 
-*Insert image here
+<img src="/images/Screenshot from 2020-06-17 13-33-49.png" alt="architecture" style="zoom:60%;" />
 
 The mask rcnn backbone currently used is ResNet 50, as it is adaptable to the addition of a self attention layer( which will be explained in later section) .
 
