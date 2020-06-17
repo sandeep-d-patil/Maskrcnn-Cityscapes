@@ -81,9 +81,11 @@ In case of classifications the cross entropy loss is used for both rpn and rcnn.
 **Self-Attention**
 
 Self attention [[Ashish](https://arxiv.org/pdf/1706.03762.pdf )] [[Prajit](https://arxiv.org/pdf/1906.05909.pdf)] is a type of attention mechanism that relates different input pixel positions to learn a representation of the input sequence. Given a pixel x<sub>ij</sub>, a memory block is generated which is composed of pixels in positions ab that are in the neighborhood of the pixel x<sub>ij</sub>. The following formula is used to compute the pixel output.
+
 $$
 y_{ij} = \sum_{a,b∈ Nk(i,j)} softmax_{ab}(q^T_{ij} * k_{ab})*v_{ab}
 $$
+
 Where q<sub>ij</sub>, k<sub>ab</sub> and v<sub>ab</sub> correspond to queries, keys and values respectively. These values are obtained by transformation learned weight matrices W<sub>Q</sub>, W<sub>K</sub> and W<sub>V</sub>. This computation is done for every pixel value in the memory block. Multiple-attention heads are used where N weight matrices are learned for N groups of pixel features, by dividing the pixel features along the depth dimension. The output of every group or head is then concatenated to produce the final output. Figure x shows an example of the computation performed by a local attention layer.
 
 <img src="/images/Screenshot from 2020-06-17 13-09-00.png" alt="SelfAttention" style="zoom:30%;" />
@@ -95,8 +97,10 @@ A local attention layer with kernel size 3. Figure by [Prajit] To encode positio
 Relative distance computation in row and column offsets, relative to the highlighted pixel. Figure by [Prajit]
 
 The row and column offsets are associated with embeddings r<sub>a-i</sub> and r<sub>b-j</sub> respectively, These embeddings are concatenated and used to compute the output y<sub>ij</sub>.
+
 $$
 y_{ij} = \sum_{a,b∈ Nk(i,j)} softmax_{ab}(q^T_{ij} * k_{ab} + q^T_{ij} * r_{a-i,b-j})*v_{ab}
 $$
+
 The logits used in the computation of the softmax contain information on content and position. The number of parameters in an attention block is independent of the size of the memory block. With convolutions, on the other hand, the parameter count grows quadratically with the size of the kernel.
 
