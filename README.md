@@ -86,11 +86,11 @@ y_{ij} = \sum_{a,b∈ Nk(i,j)} softmax_{ab}(q^T_{ij} * k_{ab})*v_{ab}
 $$
 Where q<sub>ij</sub>, k<sub>ab</sub> and v<sub>ab</sub> correspond to queries, keys and values respectively. These values are obtained by transformation learned weight matrices W<sub>Q</sub>, W<sub>K</sub> and W<sub>V</sub>. This computation is done for every pixel value in the memory block. Multiple-attention heads are used where N weight matrices are learned for N groups of pixel features, by dividing the pixel features along the depth dimension. The output of every group or head is then concatenated to produce the final output. Figure x shows an example of the computation performed by a local attention layer.
 
-<img src="/images/selfattention.png" alt="SelfAttention" style="zoom:60%;" />
+<img src="/images/Screenshot from 2020-06-17 13-09-00.png" alt="SelfAttention" style="zoom:60%;" />
 
 A local attention layer with kernel size 3. Figure by [Prajit] To encode positional information relative attention is used. The relative distance between pixels in the neighborhood of (i,j) and pixel (i,j) is computed in terms of row and column offsets. An example of relative distance computations is shown in Figure x.
 
-insert image here
+<img src="/images/Screenshot from 2020-06-17 13-09-21..png" alt="SelfAttention" style="zoom:60%;" />
 
 Relative distance computation in row and column offsets, relative to the highlighted pixel. Figure by [Prajit]
 
