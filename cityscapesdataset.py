@@ -16,25 +16,21 @@ class CityscapesDataset(AbstractDataset):
         self.root = root
         self.transforms = transforms
 
-        # load all image files, sorting them to
-        # ensure that they are aligned
-        img_dir = "/media/sandeep/Data/cityscapes/datasets/cityscapes/leftImg8bit/"
-        # split = "train"
-        ann_dir = "/media/sandeep/Data/cityscapes/datasets/cityscapes/gtFine_trainvaltest/gtFine/"
-        # self.imgs = list(sorted(os.listdir(os.path.join(root, "/mnt/hgfs/cityscapes/datasets/cityscapes/leftImg8bit/"))))
+        img_dir = "\cityscapes\datasets\cityscapes\leftImg8bit"
+        ann_dir = "\cityscapes\datasets\cityscapes\gtFine_trainvaltest\gtFine"
+
         img_dir = os.path.abspath(os.path.join(img_dir, split))
         img_pattern = os.path.join(img_dir, "*", "*_leftImg8bit.png")
-        # self.masks = list(sorted(os.listdir(os.path.join(root, "/mnt/hgfs/cityscapes/datasets/cityscapes/gtFine_trainvaltest/gtFine/train"))))
 
         ann_dir = os.path.abspath(os.path.join(ann_dir, split))
+        ann_pattern = os.path.join(ann_dir, "*", "*_instanceIds.png")
 
         img_paths = sorted(glob.glob(img_pattern))
-
-        ann_pattern = os.path.join(ann_dir, "*", "*_instanceIds.png")
         ann_paths = sorted(glob.glob(ann_pattern))
         self.img_paths = list(img_paths)
         self.ann_paths = list(ann_paths)
-        # print(self.ann_paths)
+
+        self.min_area = min_area
 
         self.split = split
         self.CLASSES = ["__background__"]
@@ -46,102 +42,155 @@ class CityscapesDataset(AbstractDataset):
             l.id: self.name_to_id[l.name] for l in csHelpers.labels if l.hasInstances
         }
 
+        # filter out images with no instances ##########################
+        indices_remove = []
+        for ind in range(len(self.ann_paths)):
+            ann = torch.from_numpy(np.array(Image.open(self.ann_paths[ind])))
+            labels_check = []
+            instIds = torch.sort(torch.unique(ann))[0]
+
+            for instId in instIds:
+
+                if int(instId) > 1000:  # group labels
+                    label = int(instId // 1000)
+                    label = self.cityscapesID_to_ind[label]
+                    labels_check.append(label)
+
+            if len(labels_check) == 0:
+                indices_remove.append(ind)
+
+        copy_imgs = []
+        copy_anns = []
+
+        for x in indices_remove:
+            copy_imgs.append(self.img_paths[x])
+            copy_anns.append(self.ann_paths[x])
+
+        self.img_paths = [x for x in self.img_paths if x not in copy_imgs]
+        self.ann_paths = [x for x in self.ann_paths if x not in copy_anns]
+
     def __getitem__(self, idx):
-        # load images ad masks
+        # load images and masks
         img_path = self.img_paths[idx]
         mask_path = self.ann_paths[idx]
-        # img_path = os.path.join(self.root, "PNGImages", self.imgs[idx])
-        # mask_path = os.path.join(self.root, "PedMasks", self.masks[idx])
         img = Image.open(img_path).convert("RGB")
         # note that we haven't converted the mask to RGB,
         # because each color corresponds to a different instance
         # with 0 being background
-        mask = Image.open(mask_path)
-        # plt.imshow(mask)
-        # plt.show()
+        ann = Image.open(mask_path)
 
-        mask = np.array(mask)
+        ann_numpy = np.array(ann)  # ann numpy
+        ann = torch.from_numpy(ann_numpy)  # ann torch
 
-        # dataset = CityscapesDataset('/')
-        # instances are encoded as different colors
-        obj_ids = np.unique(mask)
-        # print("obj_ids", obj_ids)
-        # first id is the background, so remove it
-        obj_ids = obj_ids[1:]
-        # print("obj_ids_withoutbackground", obj_ids)
-        #
-        # split the color-encoded mask into a set
-        # of binary masks
-        masks = mask == obj_ids[:, None, None]
-
-        # get bounding box coordinates for each mask
-        num_objs = len(obj_ids)
-        boxes = []
-        for i in range(num_objs):
-            pos = np.where(masks[i])
-            xmin = np.min(pos[1])
-            xmax = np.max(pos[1])
-            ymin = np.min(pos[0])
-            ymax = np.max(pos[0])
-            boxes.append([xmin, ymin, xmax, ymax])
-        #
-        boxes = torch.as_tensor(boxes, dtype=torch.float32)
-        # print("box", boxes)
-        # print("box shape", boxes.shape)
-        # there is only one class
-        # labels = torch.ones((num_objs,), dtype=torch.int64)
         labels = []
-        masks = torch.as_tensor(masks, dtype=torch.uint8)
-
-        self.cityscapesID_to_ind = {
-            l.id: self.name_to_id[l.name] for l in csHelpers.labels if l.hasInstances
-        }
-        instIds = torch.sort(torch.unique(torch.from_numpy(mask)))[0]
+        boxes = []
+        instIds = torch.sort(torch.unique(ann))[0]
         for instId in instIds:
-            if instId < 10000:  # group labels
+            if instId < 1000:  # group labels
                 continue
 
-        # masks = masks == instId
+            mask = ann == instId
             label = int(instId // 1000)
             label = self.cityscapesID_to_ind[label]
             labels.append(label)
+            a = mask.nonzero()
+            bbox = [
+                torch.min(a[:, 1]),
+                torch.min(a[:, 0]),
+                torch.max(a[:, 1]),
+                torch.max(a[:, 0]),
+            ]
+            bbox = list(map(int, bbox))
+            boxes.append(bbox)
 
+        area = []
+        for box in boxes:
+            xmin, ymin, xmax, ymax = box
+            area.append((xmax - xmin) * (ymax - ymin))
+
+        # instances are encoded as different colors
+        obj_ids = np.unique(ann_numpy)
+
+        # only keep relevant objects
+        obj_ids = np.array([ids for ids in obj_ids if ids >= 1000])
+
+        # split the color-encoded mask into a set
+        # of binary masks
+        masks = ann_numpy == obj_ids[:, None, None]
+        # print("boxes",type(boxes))
+        # print("labels",type(labels))
+        # print("area",type(area))
+        # print("masks",type(masks))
+        boxes, masks, labels, area = self._filterGT(boxes, masks, labels, area)
+        # print("boxes",type(boxes),boxes)
+        # print("labels",type(labels),labels)
+        # print("area",type(area),area)
+        # print("masks",type(masks),masks)
+
+        # convert to tensor
+        boxes = torch.as_tensor(boxes, dtype=torch.float32)
+        area = torch.as_tensor(area, dtype=torch.float32)
+        masks = torch.as_tensor(masks, dtype=torch.uint8)
         labels = torch.as_tensor(labels, dtype=torch.int64)
-        print("labels", labels.shape)
 
-        image_id = torch.tensor([idx])
-        area = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0])
+        image_id = torch.tensor([idx], dtype=torch.int64)
 
+        num_objs = len(labels)
         # suppose all instances are not crowd
-        # iscrowd = torch.zeros((num_objs,), dtype=torch.int64)
-        #
+        iscrowd = torch.zeros((num_objs,), dtype=torch.int64)
+
         target = {}
         target["boxes"] = boxes
         target["labels"] = labels
         target["masks"] = masks
         target["image_id"] = image_id
-        print("labels shape", labels.shape)
-        print("masks shape", masks.shape)
-        print("image_id shape", image_id.shape)
-        print("boxes shape", boxes)
         target["area"] = area
-        # target["iscrowd"] = iscrowd
-        print("area shape", area.shape)
+        target["iscrowd"] = iscrowd
+        # print("image name",img_path)
+        # print("labels shape", labels.shape)
+        # print("masks shape", masks.shape)
+        # print("image_id shape", image_id.shape)
+        # print("boxes shape", boxes.shape)
+        # print("area shape", area.shape)
+        # print("iscrowd shape", iscrowd.shape)
+
         if self.transforms is not None:
             img, target = self.transforms(img, target)
-        #
+
         return img, target
 
+        # filter out instances where the area is less than a certain threshold
+        # adapted from mask-rcnn benchmark
+
+    def _filterGT(self, boxes, masks, labels, areas):
+        filtered_boxes = []
+        filtered_masks = []
+        filtered_labels = []
+        filtered_area = []
+        assert len(masks) == len(labels) == len(boxes) == len(areas)
+
+        for box, mask, label, area in zip(boxes, masks, labels, areas):
+            if area < self.min_area:
+                continue
+
+            filtered_boxes.append(box)
+            filtered_masks.append(mask)
+            filtered_labels.append(label)
+            filtered_area.append(area)
+        mask_default = np.zeros((1024, 2048), dtype=bool)
+        if len(filtered_boxes) == 0:
+            filtered_boxes = [[0, 0, 10, 50], ]
+            filtered_labels = [0, ]
+            filtered_masks = [mask_default]
+            filtered_area = [500, ]
+
+        return filtered_boxes, filtered_masks, filtered_labels, filtered_area
+
     def __len__(self):
+
         return len(self.img_paths)
 
     def get_img_info(self, index):
         # Reverse engineered from voc.py
         # All the images have the same size
         return 0
-
-# mask = Image.open('/mnt/hgfs/cityscapes/datasets/cityscapes/gtFine_trainvaltest/gtFine/')
-
-
-# dataset = CityscapesDataset('/',split="train")
-# dataset[0]

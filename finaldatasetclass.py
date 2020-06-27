@@ -19,8 +19,8 @@ class CityscapesDataset(AbstractDataset):
         # load all image files, sorting them to
         # ensure that they are aligned
 
-        img_dir = "/home/sandeep/Downloads/cityscapes/leftImg8bit/"
-        ann_dir = "/home/sandeep/Downloads/cityscapes/gtFine/"
+        img_dir = "\cityscapes\datasets\cityscapes\leftImg8bit"
+        ann_dir = "\cityscapes\datasets\cityscapes\gtFine_trainvaltest\gtFine"
 
         img_dir = os.path.abspath(os.path.join(img_dir, split))
         img_pattern = os.path.join(img_dir, "*", "*_leftImg8bit.png")
@@ -49,8 +49,8 @@ class CityscapesDataset(AbstractDataset):
         img_path = self.img_paths[idx]
         mask_path = self.ann_paths[idx]
         img = Image.open(img_path).convert("RGB")
-        print("imag_path", img_path)
-        print("idx", idx)
+        # print("imag_path", img_path)
+        # print("idx", idx)
         # note that we haven't converted the mask to RGB,
         # because each color corresponds to a different instance
         # with 0 being background
