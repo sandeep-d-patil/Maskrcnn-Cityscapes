@@ -26,7 +26,7 @@ The target information is obtained from polygons in JSON files or InstanceId ima
 
 Data-preprocessing must be done to obtain label ids, which must be filtered out for traffic participants. Binary masks must also be produced for every instance in an image. Images with no instances must also be ignored.
  ### Model Description
-Mask RCNN is a state of the art deep neural network which solves instance segmentation. There are two main parts of the neural network which are backbone and head, the back bone architecture extracts features from the input images. The backbone for Mask RCNN are ResNet 50, FPN or ResNext 101 [[Kaiming et al.](https://arxiv.org/pdf/1703.06870.pdf)]. The features of the backbone are taken as input in the head , which contains two stages. In the first stage RPN or Region Proposal network scans the output of the backbone layer and it proposes anchor boxes which are bounding boxes with predefined locations and scales relative to images. At the second stage, the neural network scans these region proposed areas and generates object classes, bounding boxes and masks. This stage is called ROI Align. [[LINK](https://medium.com/@alittlepain833/simple-understanding-of-mask-rcnn-134b5b330e95#:~:text=Mask%20RCNN%20is%20a%20deep,two%20stages%20of%20Mask%20RCNN.)]
+Mask RCNN is a state of the art deep neural network which is used for instance segmentation. There are two main parts of the neural network: the backbone and the head. The backbone is responsible for extracting features from the input images. The backbones that can be implemented in Mask RCNN include ResNet 50, FPN or ResNext 101 [[Kaiming et al.](https://arxiv.org/pdf/1703.06870.pdf)]. The features output from the backbone are taken as input in the head, which is composed of two stages. In the first stage, RPN or Region Proposal network scans the output of the backbone layer and it proposes anchor boxes which are bounding boxes with predefined locations and scales relative to images. At the second stage, the neural network scans these region proposed areas and generates object classes, bounding boxes and masks. This stage is called ROI Align. [[LINK](https://medium.com/@alittlepain833/simple-understanding-of-mask-rcnn-134b5b330e95#:~:text=Mask%20RCNN%20is%20a%20deep,two%20stages%20of%20Mask%20RCNN.)]
 
 <img src="/images/Screenshot from 2020-06-17 13-33-49.png" alt="architecture" style="zoom:60%;" />
 
@@ -36,16 +36,16 @@ The mask rcnn backbone currently used is ResNet 50, as it is adaptable to the ad
 model = torchvision.models.detection.maskrcnn_resnet50_fpn(pretrained=False)
 ```
 
-The pretrained model obtained here is pretrained on the COCO 2017 dataset.When pretrained = True only the last layer of the model will be fine tuned to particular classes, otherwise finetune the whole model. Different backbones can be loaded here. A custom backbone can also be created 
+The pretrained model obtained here is pretrained on the COCO 2017 dataset. When `pretrained = True` only the last layer of the model will be fine-tuned to particular classes, otherwise finetune the whole model. Different backbones can be loaded here. A custom backbone can also be created 
 
 ```
 in_features = model.roi_heads.box_predictor.cls_score.in_features
 ```
 
 
-The region proposal network after getting the anchor boxes tries to tighten the centers of these boxes around the target. This is done through the bounding box regression. After the bounding boxes are obtained, the IOU (intersection over union) with the ground truth values is calculated and classification labels are assigned for such boxes. Box_predictor here is the module that takes the output of bounding boxes and returns the classification labels and distance between the ground truth center and predicted center which is called bounding box regression delta. This distance is then used to calculate the loss values to backpropagate. 
+After obtaining the anchor boxes, the region proposal network tries to tighten the centers of these boxes around the target. This is done through the process of bounding box regression. After the bounding boxes are obtained, the IOU (intersection over union) with the ground truth values is calculated and classification labels are assigned for such boxes. Box_predictor here is the module that takes the output of bounding boxes and returns the classification labels and distance between the ground truth center and predicted center which is called bounding box regression delta. This distance is then used to calculate the loss values for backpropagation. 
 
-The model takes in the input channels from the in_features and the num_classes which is provided specifically for datasets. For Cityscapes datasets the number of classes = 11 including the background. The FastRCNNPredictor provides the class scores and bounding box regression deltas over the predicted values.# replace the pre-trained head with a new one
+The model takes in the input channels from the in_features and the num_classes which is provided specifically for datasets. For Cityscapes dataset, the number of classes = 11 including the background. These classes correspond to instances of interest (traffic participants). The FastRCNNPredictor provides the class scores and bounding box regression deltas over the predicted values.
 
 ```
 model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
@@ -56,15 +56,16 @@ in_features_mask = model.roi_heads.mask_predictor.conv5_mask.in_channels
 hidden_layer = 256
 ```
 
-After the bounding boxes and their respective classes are obtained, the masks over the instances of the bounding boxes are calculated. The conv5 mask applies a 2D transposed convolution over the input image.# and replace the mask predictor with a new one
+After the bounding boxes and their labels are obtained, the masks over the instances of the bounding boxes are calculated. The conv5 mask applies a 2D transposed convolution over the input image.
 
 ```
+
 model.roi_heads.mask_predictor = MaskRCNNPredictor(in_features_mask,
 														hidden_layer,num_classes)
 ```
 
 This returns the masks for the predicted instances in the image.
-Explain loss, accuracy metrics- metrics were getting and what they mean - sandeepDuring training different losses are being calculated such as : classification loss, regression loss for rpn and R-CNN, mask loss.The regression loss in case of rpn and rcnn is calculated using smooth L1 loss, which is regular L1 loss at all the places except at zero. L2 loss is used to smooth the loss at zero. 
+During training, different losses are calculated such as : classification loss, regression loss for rpn and R-CNN, mask loss.The regression loss in case of rpn and rcnn is calculated using smooth L1 loss, which is regular L1 loss at all the places except at zero. L2 loss is used to smooth the loss at zero. 
 
 ```
 **psuedocode
@@ -75,6 +76,8 @@ loss = abs(d) — 1/(2*sigma**2)
 ```
 
 In case of classifications the cross entropy loss is used for both rpn and rcnn.
+
+
 
 **Self-Attention**
 
@@ -105,7 +108,7 @@ The logits used in the computation of the softmax contain information on content
 ## Experimental setup
 
 ### Dataset and hyperparameters
-We split the train images of 3 cities from the Cityscapes dataset into train and val, with 500 images for training and 20 images for validation. We train the models in our experiments on 500 images after initially filtering out images with no traffic participants. Then, we filter out instances with bounding boxes with an area less than a minimum area of 2500 pixels as suggested in this [pytorch discussion forum (https://discuss.pytorch.org/t/mask-rcnn-loss-is-nan/60064/2)]. This was to allow loss values to converge in training. The Dataset class implementation is provided here.
+We split the train images of 3 cities from the Cityscapes dataset into train and val, with 500 images for training and 20 images for validation. We train the models in our experiments on 500 images after initially filtering out images with no traffic participants. Then, we filter out instances with bounding boxes with an area less than a minimum area of 2500 pixels as suggested in this [[pytorch discussion forum](https://discuss.pytorch.org/t/mask-rcnn-loss-is-nan/60064/2)]. This was done to allow loss values to converge in training. The code for the Dataset class based on the implementation by [[maskrcnn-benchmark](https://github.com/facebookresearch/maskrcnn-benchmark)] is provided here.
 
 ```
 ### Dataset class implementation adapted from maskrcnn-benchmark
@@ -283,10 +286,55 @@ class CityscapesDataset(AbstractDataset):
         return 0
 ```
 
-The models were trained with SGD with weight decay of 0.0005, momentum of 0.9 and a learning rate of 0.0005. The authors in Mask-RCNN[mask rcnn paper] implement an initial learning rate of 0.01 with a scheduler that would reduce the learning rate to 0.0001, when training on Cityscapes. However, Our learning rate was chosen based on the learning rate used in the demo notebook provided by the authors of the maskrcnn-benchmark repository [link maskrcnn-benchmark repo]. We do not implement random scaling, but augment with random horizontal flipping with a probability of 50% as was done in the demo notebook. Similar to the authors' implementation in Mask-RCNN[], we train with a batchsize of 1, however only on a single GPU. We run our models for 10 epochs. 10 epochs were chosen since it was observed in intial runs of the models that the loss values do not improve after 10 epochs.
+The models were trained with SGD with weight decay of 0.0005, momentum of 0.9 and a learning rate of 0.0005. The authors in [[Mask-RCNN](https://arxiv.org/abs/1703.06870)] implement an initial learning rate of 0.01 with a scheduler that would reduce the learning rate to 0.0001, when training on Cityscapes. However, Our learning rate was chosen based on the learning rate used in the [[demo notebook](https://colab.research.google.com/github/pytorch/vision/blob/temp-tutorial/tutorials/torchvision_finetuning_instance_segmentation.ipynb#scrollTo=mTgWtixZTs3X)] provided by the authors of the [[maskrcnn-benchmark](https://github.com/facebookresearch/maskrcnn-benchmark)] repository. We do not implement random scaling as done in the Mask-RCNN paper, but augment with random horizontal flipping with a probability of 50% as was done in the demo notebook. Similar to the authors' implementation in [[Mask-RCNN](https://arxiv.org/abs/1703.06870)], we train with a batchsize of 1, however, only on a single GPU. We run our models for 10 epochs. 10 epochs were chosen since it was observed in intial runs of the models that the loss values do not improve after 10 epochs. The following code block shows our dataloading and hyperperameter settings.
+
+```
+import torch.utils.data
+dataset = CityscapesDataset('/','train',get_transform(train=True),min_area=2500)
+dataset_test = CityscapesDataset('/','train',get_transform(train=False),min_area=2500)
+
+# split the dataset in train and test set
+torch.manual_seed(1)
+indices = torch.randperm(len(dataset_test)).tolist()
+dataset = torch.utils.data.Subset(dataset, indices[:-86])
+dataset_test = torch.utils.data.Subset(dataset_test, indices[-20:])
+
+#define training and validation data loaders
+data_loader = torch.utils.data.DataLoader(
+    dataset, batch_size=1, shuffle=True, num_workers=4,
+    collate_fn=utils.collate_fn)
+
+data_loader_test = torch.utils.data.DataLoader(
+    dataset_test, batch_size=1, shuffle=False, num_workers=4,
+    collate_fn=utils.collate_fn)
+    
+device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+
+# our dataset has 11 classes 
+num_classes = 11
+
+# get the model using our helper function
+model = get_instance_segmentation_model(num_classes)
+
+print(model)
+# move model to the right device
+model.to(device)
+
+# construct an optimizer
+params = [p for p in model.parameters() if p.requires_grad]
+optimizer = torch.optim.SGD(params, lr=0.0005,
+                            momentum=0.9, weight_decay=0.0005)
+
+# and a learning rate scheduler which decreases the learning rate by
+# 10x every 3 epochs
+lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer,
+                                               step_size=2,
+                                               gamma=0.1)    
+```
 
 ### Effect of pretraining
 In our fist experiment, we investigate the performance of the maskrcnn model with resnet50_fpn backbone, with pretraining on COCO dataset and finetuning on Cityscapes and with training on Cityscapes from scratch. The pretrained model is imported from the torchvision library and the mask predictor and box predictor heads are replaced with new ones to match the number of classes in the Cityscapes dataset. The heads are trained on Cityscapes with randomly initialized weights and the backbone weights are finuetuned. In the second model, we train the backbone and the heads from scratch with randomly initialized weights on Cityscapes.
+
 ### Effect of self attention
 In our second experiment, we aim to investigate the effect of replacing the 3x3 convolution kernels in the first layer of the resnet model. The first layer of the resnet model consists of 3 bottleneck layers. Each bottleneck layer consists of a 1x1 convolution , a 3x3 convolution and a 1x1 convolution. The 3x3 convolutions in each of the 3 layers in the first bottleneck layer was replaced by an attention convolution as defined in [cite attention convolution code]. The model is also entirely trained from scratch. In this experiment, the performance of the model with self-attention convolution and without the self-attention convolution can be compared. Both models are entirely pretrained from scratch.
 
