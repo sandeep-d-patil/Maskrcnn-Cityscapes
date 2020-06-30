@@ -105,7 +105,7 @@ The logits used in the computation of the softmax contain information on content
 ## Experimental setup
 
 ### Dataset and hyperparameters
-We split the train images of 3 cities from the Cityscapes dataset into train and val, with 500 images for training and 20 images for validation. We train the models in our experiments on 500 images after initially filtering out images with no traffic participants. Then, we filter out instances with bounding boxes with an area less than a minimum area of 2500 pixels as suggested in [pytorch discussion forum]. This was to allow loss values to converge in training. The Dataset class implementation is provided here.
+We split the train images of 3 cities from the Cityscapes dataset into train and val, with 500 images for training and 20 images for validation. We train the models in our experiments on 500 images after initially filtering out images with no traffic participants. Then, we filter out instances with bounding boxes with an area less than a minimum area of 2500 pixels as suggested in this [pytorch discussion forum (https://discuss.pytorch.org/t/mask-rcnn-loss-is-nan/60064/2)]. This was to allow loss values to converge in training. The Dataset class implementation is provided here.
 
 ```
 ### Dataset class implementation adapted from maskrcnn-benchmark
