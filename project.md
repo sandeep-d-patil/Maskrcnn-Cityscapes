@@ -1,4 +1,10 @@
 # This is a project.md file.
+
+## Resnet with FPN backbone
+Resnet is 
+FPN uses a top down architecture with lateral connections to build a feature pyramid from a single scale input as shown in the figure above. The 
+
+https://github.com/mapbox/robosat/issues/60
 ## Reason where we added attention conv layer, and the values we chose for the same.
 
 Self attention [[Ashish](https://arxiv.org/pdf/1706.03762.pdf )] [[Prajit](https://arxiv.org/pdf/1906.05909.pdf)] is a type of attention mechanism that relates different input pixel positions to learn a representation of the input sequence. Given a pixel x<sub>ij</sub>, a memory block is generated which is composed of pixels in positions ab that are in the neighborhood of the pixel x<sub>ij</sub>. The following formula is used to compute the pixel output.
