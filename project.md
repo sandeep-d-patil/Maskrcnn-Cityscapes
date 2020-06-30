@@ -87,4 +87,4 @@ The attention layer is applied to the first bottleneck layer as shown below:
 self.conv2 = AttentionConv(width, width, kernel_size=7, padding=3, groups=8)
 ```
 
-Here the inputs width refer to `width = int(planes * (base_width / 64.)) * groups` 
+Here the inputs width refer to `int(planes * (base_width / 64.)) * groups` which takes in the downscaled input from the conv1x1 layer. The value of width in the first layer of the bottleneck is 
