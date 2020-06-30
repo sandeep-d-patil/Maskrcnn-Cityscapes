@@ -102,8 +102,22 @@ The row and column offsets are associated with embeddings r<sub>a-i</sub> and r<
 
 
 The logits used in the computation of the softmax contain information on content and position. The number of parameters in an attention block is independent of the size of the memory block. With convolutions, on the other hand, the parameter count grows quadratically with the size of the kernel.
+# Experimental setup
 
-## Implementation
+## Dataset and hyperparameters
+We split the train images of 3 cities from the Cityscapes dataset into train and val, with 500 images for training and 20 images for validation. We train the models in our experiments on 500 images after initially filtering out images with no traffic participants. Then, we filter out instances with bounding boxes with an area less than a minimum area of 2500 pixels as suggested in [pytorch discussion forum]. This was to allow loss values to converge in training. The models were trained with SGD with weight decay of 0.0005, momentum of 0.9 and a learning rate of 0.0005. The authors in Mask-RCNN[mask rcnn paper] implement an initial learning rate of 0.01 with a scheduler that would reduce the learning rate to 0.0001, when training on Cityscapes. However, Our learning rate was chosen based on the learning rate used in the demo notebook provided by the authors of the maskrcnn-benchmark repository [link maskrcnn-benchmark repo]. We do not implement random scaling, but augment with random horizontal flipping with a probability of 50% as was done in the demo notebook. Similar to the authors' implementation in Mask-RCNN[], we train with a batchsize of 1. With initial runs of the models, we observe      
+
+## Effect of pretraining
+In our fist experiment, we investigate the performance of the maskrcnn model with resnet50_fpn backbone with pretraining on COCO dataset and finetuning on Cityscapes and with training on Cityscapes from scratch. The pretrained model is imported from the torchvision library and the mask predictor and box predictor heads are replaced with new ones to match the number of classes in the Cityscapes dataset. The heads are trained on Cityscapes with randomly initialized weights and the backbone weights are finuetuned. In the second model, we train the backbone and the heads from scratch with randomly initialized weights on Cityscapes. 
+
+# Results
 With the pretrained model from coco dataset 2017, We trained the images for 30 epochs and the predicted mask can be seen below:
 
 <img src="/images/dataset1.png" alt="predicted" style="zoom:10%;" />
+
+## Future Work
+
+## Threats to validity
+Images were filtered out in 2 stages. First, images with no instances were filtered out. This could negatively impact the performance achieved by the models since the model would benefit from images with no instances and would reduce false positives. The decision to filter out these images was made to prevent errors in training and evaluation with pycoco training and evaluation functions that would rely on the presence of bounding boxes.In a second filtering stage, images with bounding boxes with an area less than a minimum area were filtered out, with some images returning no bounding boxes. For these images, one instance in the images was returned with a binary mask of zeros, a label of 0, and an area that was set to 500 pixels. It remains unclear whether returned instance is accounted for in the loss functions since background pixels should in theory not be taken into account in the loss. It was found however that these values would allow for the loss values to converge in training and were thus used. For a future implemetation, the effect of these filter stages should be thoroughly investigated.  
+
+
