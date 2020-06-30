@@ -81,4 +81,10 @@ class AttentionConv(nn.Module):
         init.normal_(self.rel_h, 0, 1)
         init.normal_(self.rel_w, 0, 1)
 ```
+The attention layer is applied to the first bottleneck layer as shown below:
 
+```BottleneckAttention
+self.conv2 = AttentionConv(width, width, kernel_size=7, padding=3, groups=8)
+```
+
+Here the inputs width refer to `width = int(planes * (base_width / 64.)) * groups` 
