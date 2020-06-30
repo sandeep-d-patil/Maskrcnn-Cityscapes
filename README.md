@@ -105,7 +105,185 @@ The logits used in the computation of the softmax contain information on content
 ## Experimental setup
 
 ### Dataset and hyperparameters
-We split the train images of 3 cities from the Cityscapes dataset into train and val, with 500 images for training and 20 images for validation. We train the models in our experiments on 500 images after initially filtering out images with no traffic participants. Then, we filter out instances with bounding boxes with an area less than a minimum area of 2500 pixels as suggested in [pytorch discussion forum]. This was to allow loss values to converge in training. The models were trained with SGD with weight decay of 0.0005, momentum of 0.9 and a learning rate of 0.0005. The authors in Mask-RCNN[mask rcnn paper] implement an initial learning rate of 0.01 with a scheduler that would reduce the learning rate to 0.0001, when training on Cityscapes. However, Our learning rate was chosen based on the learning rate used in the demo notebook provided by the authors of the maskrcnn-benchmark repository [link maskrcnn-benchmark repo]. We do not implement random scaling, but augment with random horizontal flipping with a probability of 50% as was done in the demo notebook. Similar to the authors' implementation in Mask-RCNN[], we train with a batchsize of 1, however only on a single GPU. We run our models for 10 epochs. 10 epochs were chosen since it was observed in intial runs of the models that the loss values do not improve after 10 epochs.      
+We split the train images of 3 cities from the Cityscapes dataset into train and val, with 500 images for training and 20 images for validation. We train the models in our experiments on 500 images after initially filtering out images with no traffic participants. Then, we filter out instances with bounding boxes with an area less than a minimum area of 2500 pixels as suggested in [pytorch discussion forum]. This was to allow loss values to converge in training. The Dataset class implementation is provided here.
+
+```
+### Dataset class implementation adapted from maskrcnn-benchmark
+
+class CityscapesDataset(AbstractDataset):
+    def __init__(self, root, split, transforms=None,min_area=0, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.root = root
+        self.transforms = transforms
+
+        # load all image files, sorting them to
+        # ensure that they are aligned
+        
+        #replace with path to img and annotation folders
+        img_dir = "/content/gdrive/My Drive/CITYSCAPES_DATASET/leftImg8bit/"
+        ann_dir = "/content/gdrive/My Drive/CITYSCAPES_DATASET/gtFine/"
+        
+        img_dir = os.path.abspath(os.path.join(img_dir, split))
+        img_pattern = os.path.join(img_dir, "*", "*_leftImg8bit.png")
+        
+        ann_dir = os.path.abspath(os.path.join(ann_dir, split))
+        ann_pattern = os.path.join(ann_dir, "*", "*_instanceIds.png")
+        
+        img_paths = sorted(glob.glob(img_pattern))
+        ann_paths = sorted(glob.glob(ann_pattern))
+        self.img_paths = list(img_paths)
+        self.ann_paths = list(ann_paths)
+
+        self.min_area = min_area
+        
+        self.split = split
+        self.CLASSES = ["__background__"]
+        self.CLASSES += [l.name for l in csHelpers.labels if l.hasInstances]
+
+        self.initMaps()
+
+        self.cityscapesID_to_ind = {
+            l.id: self.name_to_id[l.name] for l in csHelpers.labels if l.hasInstances
+        }
+
+        #filter out images with no instances (traffic participants)  
+        indices_remove=[]
+        for ind in range(len(self.ann_paths)):   
+            ann = torch.from_numpy(np.array(Image.open(self.ann_paths[ind])))
+            labels_check = []
+            instIds = torch.sort(torch.unique(ann))[0]
+            
+            for instId in instIds:
+                
+                if int(instId) > 1000:  # group labels                
+                    label = int(instId // 1000)
+                    label = self.cityscapesID_to_ind[label]
+                    labels_check.append(label)
+            
+            
+            if len(labels_check)==0:                
+                indices_remove.append(ind)
+                                
+        copy_imgs=[]
+        copy_anns=[]
+      
+        for x in indices_remove:
+            copy_imgs.append(self.img_paths[x])
+            copy_anns.append(self.ann_paths[x])            
+               
+        self.img_paths=[x for x in self.img_paths if x not in copy_imgs]
+        self.ann_paths=[x for x in self.ann_paths if x not in copy_anns]
+                
+    def __getitem__(self, idx):
+        # load images and masks
+        img_path = self.img_paths[idx]
+        mask_path = self.ann_paths[idx]
+        img = Image.open(img_path).convert("RGB")
+        ann = Image.open(mask_path)
+      
+        ann_numpy = np.array(ann) #ann numpy
+        ann = torch.from_numpy(ann_numpy) #ann torch
+        
+        labels = []
+        boxes=[] 
+        instIds = torch.sort(torch.unique(ann))[0]
+        for instId in instIds:
+            if instId < 1000:  
+                continue
+
+            mask = ann == instId 
+            label = int(instId // 1000)
+            label = self.cityscapesID_to_ind[label]
+            labels.append(label)
+            a = mask.nonzero()
+            bbox = [
+                torch.min(a[:, 1]),
+                torch.min(a[:, 0]),
+                torch.max(a[:, 1]),
+                torch.max(a[:, 0]),
+            ]
+            bbox = list(map(int, bbox))
+            boxes.append(bbox)
+
+        area=[]
+        for box in boxes:
+            xmin, ymin, xmax, ymax = box
+            area.append((xmax - xmin) * (ymax - ymin))
+
+        # instances are encoded as different colors
+        obj_ids = np.unique(ann_numpy)
+        #only keep relevant objects
+        obj_ids=np.array([ids for ids in obj_ids if ids >= 1000])
+        
+        # split the color-encoded mask into a set
+        # of binary masks
+        masks = ann_numpy == obj_ids[:,None,None]
+         
+        boxes, masks, labels, area = self._filterGT(boxes, masks, labels, area)
+        
+        #convert to tensor
+        boxes = torch.as_tensor(boxes, dtype=torch.float32)
+        area = torch.as_tensor(area, dtype=torch.float32)
+        masks = torch.as_tensor(masks, dtype=torch.uint8)
+        labels = torch.as_tensor(labels, dtype=torch.int64) 
+        image_id = torch.tensor([idx], dtype=torch.int64)
+
+        num_objs = len(labels)
+        # suppose all instances are not crowd
+        iscrowd = torch.zeros((num_objs,), dtype=torch.int64)
+        
+        target = {}
+        target["boxes"] = boxes
+        target["labels"] = labels
+        target["masks"] = masks
+        target["image_id"] = image_id
+        target["area"] = area
+        target["iscrowd"] = iscrowd
+  
+        if self.transforms is not None:
+            img, target = self.transforms(img, target)
+        
+        return img, target
+    
+    #filter out instances where the area is less than a certain threshold
+    # adapted from mask-rcnn benchmark
+    def _filterGT(self, boxes, masks, labels,areas):
+        filtered_boxes = []
+        filtered_masks = []
+        filtered_labels = []
+        filtered_area=[]
+        assert len(masks) == len(labels) == len(boxes) == len(areas)
+
+        for box, mask, label, area in zip(boxes, masks, labels, areas):
+            if area < self.min_area:
+                continue
+
+            filtered_boxes.append(box)
+            filtered_masks.append(mask)
+            filtered_labels.append(label)
+            filtered_area.append(area)
+        
+        # if no boxes returned, output single instance with label 0 
+        mask_default=np.zeros((1024, 2048), dtype=bool)
+        if len(filtered_boxes) == 0:
+            filtered_boxes=[[0,0,10,50],]
+            filtered_labels=[0,]
+            filtered_masks=[mask_default]
+            filtered_area=[500,]
+     
+        return filtered_boxes, filtered_masks, filtered_labels, filtered_area
+
+    def __len__(self):
+        
+        return len(self.img_paths)
+
+    def get_img_info(self, index):
+        # Reverse engineered from voc.py
+        # All the images have the same size
+        return 0
+```
+
+The models were trained with SGD with weight decay of 0.0005, momentum of 0.9 and a learning rate of 0.0005. The authors in Mask-RCNN[mask rcnn paper] implement an initial learning rate of 0.01 with a scheduler that would reduce the learning rate to 0.0001, when training on Cityscapes. However, Our learning rate was chosen based on the learning rate used in the demo notebook provided by the authors of the maskrcnn-benchmark repository [link maskrcnn-benchmark repo]. We do not implement random scaling, but augment with random horizontal flipping with a probability of 50% as was done in the demo notebook. Similar to the authors' implementation in Mask-RCNN[], we train with a batchsize of 1, however only on a single GPU. We run our models for 10 epochs. 10 epochs were chosen since it was observed in intial runs of the models that the loss values do not improve after 10 epochs.
 
 ### Effect of pretraining
 In our fist experiment, we investigate the performance of the maskrcnn model with resnet50_fpn backbone, with pretraining on COCO dataset and finetuning on Cityscapes and with training on Cityscapes from scratch. The pretrained model is imported from the torchvision library and the mask predictor and box predictor heads are replaced with new ones to match the number of classes in the Cityscapes dataset. The heads are trained on Cityscapes with randomly initialized weights and the backbone weights are finuetuned. In the second model, we train the backbone and the heads from scratch with randomly initialized weights on Cityscapes.
