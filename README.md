@@ -65,7 +65,14 @@ model.roi_heads.mask_predictor = MaskRCNNPredictor(in_features_mask,
 ```
 
 This returns the masks for the predicted instances in the image.
-During training, different losses are calculated such as : classification loss, regression loss for rpn and R-CNN, mask loss.The regression loss in case of rpn and rcnn is calculated using smooth L1 loss, which is regular L1 loss at all the places except at zero. L2 loss is used to smooth the loss at zero. 
+rpn_class_loss = RPN anchor classifier loss
+rpn_bbox_loss = RPN bounding box loss graph
+mrcnn_class_loss = loss for the classifier head of Mask R-CNN
+mrcnn_bbox_loss = loss for Mask R-CNN bounding box refinement
+mrcnn_mask_loss
+
+### Losses
+During training, different losses are computed and are : classification loss, regression loss for rpn and R-CNN, mask loss.The regression loss in case of rpn and rcnn is calculated using smooth L1 loss, which is regular L1 loss at all the places except at zero. L2 loss is used to smooth the loss at zero. 
 
 ```
 **psuedocode
@@ -77,6 +84,7 @@ loss = abs(d) — 1/(2*sigma**2)
 
 In case of classifications the cross entropy loss is used for both rpn and rcnn.
 
+During training, different losses are computed and are: loss, rpn_class_loss, rpn_bbox_loss, mrcnn_class_loss, mrcnn_bbox_loss and mrcnn_mask_loss. loss is the summation of the other 5 loss values. The classification losses reflect the model's confidence in predicting the true class. mrcnn_class_loss is a cross-entropy loss computed for all instances in an image. rpn_class_loss is computed based on whether the generated anchors belong to the background or foreground. The bounding box losses reflect how close the true box parameters are from the predicted boxes. In the case of rpn_bbox_loss, the loss value indicates the ability of the model to locate objects within an image. In the case of mrcnn_bbox_loss, the loss indicates the ability of the model to precisely fit the bounding boxes around objects detected in the image. The mrcnn_mask_loss is a binary cross-entropy loss. A binary mask is generated for each bounding box and the loss is computed by comparing the ground truth binary mask for the true class with that for the generated binary mask for the same class. The loss indicates the ability of the model to generate a mask that falls over only those pixels which belong to the instance in the foreground. 
 
 
 **Self-Attention**
@@ -286,7 +294,7 @@ class CityscapesDataset(AbstractDataset):
         return 0
 ```
 
-The models were trained with SGD with weight decay of 0.0005, momentum of 0.9 and a learning rate of 0.0005. The authors in [[Mask-RCNN](https://arxiv.org/abs/1703.06870)] implement an initial learning rate of 0.01 with a scheduler that would reduce the learning rate to 0.0001, when training on Cityscapes. However, Our learning rate was chosen based on the learning rate used in the [[demo notebook](https://colab.research.google.com/github/pytorch/vision/blob/temp-tutorial/tutorials/torchvision_finetuning_instance_segmentation.ipynb#scrollTo=mTgWtixZTs3X)] provided by the authors of the [[maskrcnn-benchmark](https://github.com/facebookresearch/maskrcnn-benchmark)] repository. We do not implement random scaling as done in the Mask-RCNN paper, but augment with random horizontal flipping with a probability of 50% as was done in the demo notebook. Similar to the authors' implementation in [[Mask-RCNN](https://arxiv.org/abs/1703.06870)], we train with a batchsize of 1, however, only on a single GPU. We run our models for 10 epochs. 10 epochs were chosen since it was observed in intial runs of the models that the loss values do not improve after 10 epochs. The following code block shows our dataloading and hyperperameter settings.
+The models were trained with SGD with weight decay of 0.0005, momentum of 0.9 and a learning rate of 0.0005. The authors in [[Mask-RCNN](https://arxiv.org/abs/1703.06870)] implement an initial learning rate of 0.01 with a scheduler that would reduce the learning rate to 0.0001, when training on Cityscapes. However, Our learning rate was chosen based on the learning rate used in the [[demo notebook](https://colab.research.google.com/github/pytorch/vision/blob/temp-tutorial/tutorials/torchvision_finetuning_instance_segmentation.ipynb#scrollTo=mTgWtixZTs3X)] provided in [[pytorch torchvision object detection fine tuning tutorial](https://pytorch.org/tutorials/intermediate/torchvision_tutorial.html)]. We do not implement random scaling as done in the Mask-RCNN paper, but augment with random horizontal flipping with a probability of 50% as was done in the demo notebook. Similar to the authors' implementation in [[Mask-RCNN](https://arxiv.org/abs/1703.06870)], we train with a batchsize of 1, however, only on a single GPU. We run our models for 10 epochs. 10 epochs were chosen since it was observed in intial runs of the models that the loss values do not improve after 10 epochs. The following code block shows our dataloading and hyperperameter settings.
 
 ```
 import torch.utils.data
