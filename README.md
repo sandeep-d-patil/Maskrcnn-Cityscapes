@@ -447,6 +447,28 @@ In our fist experiment, we investigate the performance of the maskrcnn model wit
 ### Effect of self attention
 In our second experiment, we aim to investigate the effect of replacing the 3x3 convolution kernels in the first layer of the resnet model. The first layer of the resnet model consists of 3 bottleneck layers. Each bottleneck layer consists of a 1x1 convolution , a 3x3 convolution and a 1x1 convolution. The 3x3 convolutions in each of the 3 layers in the first bottleneck layer was replaced by an attention convolution as defined in [cite attention convolution code]. The model is also entirely trained from scratch. In this experiment, the performance of the model with self-attention convolution and without the self-attention convolution can be compared. Both models are entirely pretrained from scratch.
 
+### Number of parameters
+<table class="tg">
+<thead>
+  <tr>
+    <th class="tg-c3ow">Model</th>
+    <th class="tg-0lax">Total no. parameters</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td class="tg-c3ow">resnet50_fpn mask-rcnn</td>
+    <td class="tg-0lax">43,970,833</td>
+  </tr>
+  <tr>
+    <td class="tg-c3ow">resnet50_fpn mask-rcnn with self-attention</td>
+    <td class="tg-0lax">43,898,449</td>
+  </tr>
+</tbody>
+</table>
+
+As can be seen from the table above, the number of total parameters are reduced by 72,384. This is in agreement with the findings in [[Prajit](https://arxiv.org/abs/1906.05909)]
+
 ## Results
 ### Loses
 The loss values presented in the following figures are shown for the purpose of general trend visualization with smoothed values with a factor of 0.6.
