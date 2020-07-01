@@ -93,7 +93,7 @@ Relative distance computation in row and column offsets, relative to the highlig
 The row and column offsets are associated with embeddings r<sub>a-i</sub> and r<sub>b-j</sub> respectively, These embeddings are concatenated and used to compute the output y<sub>ij</sub>.
 
 <p align="center">
-<img src="https://render.githubusercontent.com/render/math?math=y_{ij} = \sum_{a,b Nk(i,j)} softmax_{ab}(q^T_{ij} * k_{ab} %20 q^T_{ij} * r_{a-i,b-j})*v_{ab}" />
+<img src="https://render.githubusercontent.com/render/math?math=y_{ij} = \sum_{a,b Nk(i,j)} softmax_{ab}(q^T_{ij} * k_{ab} %2B q^T_{ij} * r_{a-i,b-j})*v_{ab}" />
 </p>
 
 The logits used in the computation of the softmax contain information on content and position. The number of parameters in an attention block is independent of the size of the memory block. With convolutions, on the other hand, the parameter count grows quadratically with the size of the kernel.
