@@ -103,3 +103,57 @@ Here the inputs <b>width</b> refer to `int(planes * (base_width / 64.)) * groups
 | mask-rcnn from scratch (20 epochs)       | 1.0   | 3.2  |  0.1 |  0.7  |  2.4  |  0.1  |
 | mask-rcnn from scratch (10 epochs)       | 1.0   | 3.2  |  0.1 |  0.7  |  2.4  |  0.1  |
 | mask-rcnn with self attention (10 epochs)| 0.8   | 2.8  |  0.1 |  0.6  | 1.9   |  0.0  | 
+
+
+
+<table class="tg">
+<thead>
+  <tr>
+    <th class="tg-c3ow">Model</th>
+    <th class="tg-0lax">AP<sup>bb</sup></th>
+    <th class="tg-7btt">AP<sub>50</sub><sup>bb</sup></th>
+    <th class="tg-7btt">AP<sub>75</sub><sup>bb</sup></th>
+    <th class="tg-7btt">AP<sup>seg</sup></th>
+    <th class="tg-7btt">AP<sub>50</sub><sup>seg</sup></th>
+    <th class="tg-7btt">AP<sub>75</sub><sup>seg</sup></th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td class="tg-c3ow">Pretrained mask-rcnn (10 epochs)</td>
+    <td class="tg-0lax">18.9</td>
+    <td class="tg-c3ow">33.0</td>
+    <td class="tg-c3ow">17.1</td>
+    <td class="tg-c3ow">15.0</td>
+    <td class="tg-c3ow">31.5</td>
+    <td class="tg-c3ow">11.4</td>
+  </tr>
+  <tr>
+    <td class="tg-c3ow">mask-rcnn from scratch (20 epochs)</td>
+    <td class="tg-0lax">1.0</td>
+    <td class="tg-c3ow">3.2</td>
+    <td class="tg-c3ow">0.1</td>
+    <td class="tg-c3ow">0.7</td>
+    <td class="tg-c3ow">2.4</td>
+    <td class="tg-c3ow">0.1</td>
+  </tr>
+  <tr>
+    <td class="tg-c3ow">mask-rcnn from scratch (10 epochs)</td>
+    <td class="tg-0lax">1.0</td>
+    <td class="tg-c3ow">3.2</td>
+    <td class="tg-c3ow">0.1</td>
+    <td class="tg-c3ow">0.7</td>
+    <td class="tg-c3ow">2.4</td>
+    <td class="tg-c3ow">0.1</td>
+  </tr>
+  <tr>
+    <td class="tg-c3ow">mask-rcnn with self attention (10epochs)</td>
+    <td class="tg-0lax">0.8</td>
+    <td class="tg-c3ow">2.8</td>
+    <td class="tg-c3ow">0.1</td>
+    <td class="tg-c3ow">0.6</td>
+    <td class="tg-c3ow">1.9</td>
+    <td class="tg-c3ow">0.0</td>
+  </tr>
+</tbody>
+</table>
