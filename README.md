@@ -1,11 +1,14 @@
-# **Mask RCNN - Cityscapes Dataset**
+# **Mask RCNN - with Cityscapes Dataset**
 
-## What we aim to achieve
+## Introduction
+Mask RCNN is a state of the art instance segmentation network, which focuses on pixel level classification and outputs the bounding boxes, classes and masks. 
+Self Attention is a attention mechanism which relates different positions of the same image in order to compute/learn the representation of the image [ref](https://lilianweng.github.io/lil-log/2018/06/24/attention-attention.html#self-attention). 
 
 To investigate the improvement in accuracy of a Mask-RCNN model trained on Cityscapes dataset with the addition of self-attention layers for the task of instance segmentation.
 
 ### Mask RCNN Description
-Mask RCNN is a state of the art deep neural network which is used for instance segmentation. There are two main parts of the neural network: the backbone and the head. The backbone is responsible for extracting features from the input images. The backbones that can be implemented in Mask RCNN include ResNet 50, FPN or ResNext 101 [[Kaiming et al.](https://arxiv.org/pdf/1703.06870.pdf)]. The features output from the backbone are taken as input in the head, which is composed of two stages. In the first stage, RPN or Region Proposal network scans the output of the backbone layer and it proposes anchor boxes which are bounding boxes with predefined locations and scales relative to images. At the second stage, the neural network scans these region proposed areas and generates object classes, bounding boxes and masks. This stage is called ROI Align. [[LINK](https://medium.com/@alittlepain833/simple-understanding-of-mask-rcnn-134b5b330e95#:~:text=Mask%20RCNN%20is%20a%20deep,two%20stages%20of%20Mask%20RCNN.)]
+
+The backbone is responsible for extracting features from the input images. The backbones that can be implemented in Mask RCNN include ResNet 50, FPN or ResNext 101 [[Kaiming et al.](https://arxiv.org/pdf/1703.06870.pdf)]. The features output from the backbone are taken as input in the head, which is composed of two stages. In the first stage, RPN or Region Proposal network scans the output of the backbone layer and it proposes anchor boxes which are bounding boxes with predefined locations and scales relative to images. At the second stage, the neural network scans these region proposed areas and generates object classes, bounding boxes and masks. This stage is called ROI Align. [[LINK](https://medium.com/@alittlepain833/simple-understanding-of-mask-rcnn-134b5b330e95#:~:text=Mask%20RCNN%20is%20a%20deep,two%20stages%20of%20Mask%20RCNN.)]
 
 <p align="center">
   <img src="./images/Screenshot from 2020-06-17 13-33-49.png" alt="architecture" style="zoom:60%;" >
@@ -42,7 +45,7 @@ After the bounding boxes and their labels are obtained, the masks over the insta
 ```
 
 model.roi_heads.mask_predictor = MaskRCNNPredictor(in_features_mask,
-														hidden_layer,num_classes)
+							hidden_layer,num_classes)
 ```
 
 This returns the masks for the predicted instances in the image.
@@ -63,6 +66,7 @@ FPN uses a top down architecture with lateral connections to build a feature pyr
   <img width="640" height="480" src="./images/resnetwithfpn.jpg" alt="SelfAttention" >
 </p>
 
+{Add explanation about rpn and mask generation}
 
 #### Self Attention
 Self attention [[Ashish](https://arxiv.org/pdf/1706.03762.pdf )] [[Prajit](https://arxiv.org/pdf/1906.05909.pdf)] is a type of attention mechanism that relates different input pixel positions to learn a representation of the input sequence. Given a pixel x<sub>ij</sub>, a memory block is generated which is composed of pixels in positions ab that are in the neighborhood of the pixel x<sub>ij</sub>. The following formula is used to compute the pixel output.
@@ -106,7 +110,8 @@ class AttentionConv(nn.Module):
         self.padding = padding
         self.groups = groups
 
-        assert self.out_channels % self.groups == 0, "out_channels should be divided by groups. (example: out_channels: 40, groups: 4)"
+        assert self.out_channels % self.groups == 0, 
+		"out_channels should be divided by groups. (example: out_channels: 40, groups: 4)"
 
         self.rel_h = nn.Parameter(torch.randn(out_channels // 2, 1, 1, kernel_size, 1), requires_grad=True)
         self.rel_w = nn.Parameter(torch.randn(out_channels // 2, 1, 1, 1, kernel_size), requires_grad=True)
@@ -131,8 +136,10 @@ class AttentionConv(nn.Module):
         k_out_h, k_out_w = k_out.split(self.out_channels // 2, dim=1)
         k_out = torch.cat((k_out_h + self.rel_h, k_out_w + self.rel_w), dim=1)
 
-        k_out = k_out.contiguous().view(batch, self.groups, self.out_channels // self.groups, height, width, -1)
-        v_out = v_out.contiguous().view(batch, self.groups, self.out_channels // self.groups, height, width, -1)
+        k_out = k_out.contiguous().view(batch, self.groups, 
+			self.out_channels // self.groups, height, width, -1)
+        v_out = v_out.contiguous().view(batch, self.groups, 
+			self.out_channels // self.groups, height, width, -1)
 
         q_out = q_out.view(batch, self.groups, self.out_channels // self.groups, height, width, 1)
 
