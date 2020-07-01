@@ -462,7 +462,7 @@ With the pretrained model from coco dataset 2017, We trained the images for 30 e
 <img src="./images/pretrainedtrue/lossobject1.jpg" alt="predicted10" style="zoom:40%;" >
 <img src="./images/pretrainedtrue/lossrpnboxreg1.jpg" alt="predicted11" style="zoom:40%;" >
 <img src="./images/pretrainedtrue/lossboxreg1.jpg" alt="predicted12" style="zoom:40%;" >
-<figcaption>Loss values for 10 epochs</figcaption>
+<figcaption>Loss values for 1 epochs</figcaption>
 </figure>
 
 ## Future Work
