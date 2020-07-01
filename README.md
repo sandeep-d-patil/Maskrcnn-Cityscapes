@@ -456,12 +456,12 @@ With the pretrained model from coco dataset 2017, We trained the images for 30 e
 </p>
 
 <p align="center">
-<img src="./images/pretrainedtrue/lossvalue1.jpg" alt="predicted1" style="zoom:40%;" >
-<img src="./images/pretrainedtrue/lossclass1.jpg" alt="predicted1" style="zoom:40%;" >
-<img src="./images/pretrainedtrue/lossmask1.jpg" alt="predicted1" style="zoom:40%;" >
-<img src="./images/pretrainedtrue/lossobject1.jpg" alt="predicted1" style="zoom:40%;" >
-<img src="./images/pretrainedtrue/lossrpnboxreg1.jpg" alt="predicted1" style="zoom:40%;" >
-<img src="./images/pretrainedtrue/lossboxreg1.jpg" alt="predicted1" style="zoom:40%;" >
+<img src="./images/pretrainedtrue/lossvalue1.jpg" alt="predicted7" style="zoom:40%;" >
+<img src="./images/pretrainedtrue/lossclass1.jpg" alt="predicted8" style="zoom:40%;" >
+<img src="./images/pretrainedtrue/lossmask1.jpg" alt="predicted9" style="zoom:40%;" >
+<img src="./images/pretrainedtrue/lossobject1.jpg" alt="predicted10" style="zoom:40%;" >
+<img src="./images/pretrainedtrue/lossrpnboxreg1.jpg" alt="predicted11" style="zoom:40%;" >
+<img src="./images/pretrainedtrue/lossboxreg1.jpg" alt="predicted12" style="zoom:40%;" >
 </p>
 
 ## Future Work
