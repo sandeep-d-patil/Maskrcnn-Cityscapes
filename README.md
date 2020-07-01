@@ -11,7 +11,7 @@ Resnet, also known as Residual Networks [Kaiming et al](https://arxiv.org/pdf/15
 FPN uses a top down architecture with lateral connections to build a feature pyramid from a single scale input as shown in the figure above. The 
 
 <p align="center">
-  <img src="./images/resnetwithfpn.jpg" alt="SelfAttention" style="zoom:30%;" >
+  <img width="640" height="480" src="./images/resnetwithfpn.jpg" alt="SelfAttention" >
 </p>
 
 https://github.com/mapbox/robosat/issues/60
@@ -25,13 +25,15 @@ Self attention [[Ashish](https://arxiv.org/pdf/1706.03762.pdf )] [[Prajit](https
 Where q<sub>ij</sub>, k<sub>ab</sub> and v<sub>ab</sub> correspond to queries, keys and values respectively. These values are obtained by transformation learned weight matrices W<sub>Q</sub>, W<sub>K</sub> and W<sub>V</sub>. This computation is done for every pixel value in the memory block. Multiple-attention heads are used where N weight matrices are learned for N groups of pixel features, by dividing the pixel features along the depth dimension. The output of every group or head is then concatenated to produce the final output. Figure x shows an example of the computation performed by a local attention layer.
 
 <p align="center">
-  <img src="./images/Screenshot from 2020-06-17 13-09-00.png" alt="SelfAttention" style="zoom:30%;" >
+  <img src="./images/Screenshot from 2020-06-17 13-09-00.png" alt="SelfAttention" style="zoom:60%;" >
 </p>
 
 
 A local attention layer with kernel size 3. Figure by [Prajit] To encode positional information relative attention is used. The relative distance between pixels in the neighborhood of (i,j) and pixel (i,j) is computed in terms of row and column offsets. An example of relative distance computations is shown in Figure x.
 
-<img src="/images/Screenshot from 2020-06-17 13-09-21.png" alt="Pixels" style="zoom:60%;" />
+<p align="center">
+  <img src="./images/Screenshot from 2020-06-17 13-09-21.png" alt="Pixels" style="zoom:60%;" >
+</p>
 
 Relative distance computation in row and column offsets, relative to the highlighted pixel. Figure by [Prajit]
 
