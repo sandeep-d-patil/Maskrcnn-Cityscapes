@@ -96,9 +96,9 @@ self.conv2 = AttentionConv(width, width, kernel_size=7, padding=3, groups=8)
 Here the inputs <b>width</b> refer to `int(planes * (base_width / 64.)) * groups` which takes in the downscaled input from the conv1x1 layer. The value of width in the first layer of the bottleneck is 64. A lower spatial size of the kernel (kernel_size=3) did not capture the information and improvements are seen by increasing the spatial size. A kernel size of 7 was found to be more appropriate according the paper [[Ashish](https://arxiv.org/pdf/1706.03762.pdf )]. The padding size is chosen to be 3 {Why?} and the groups denote the number of attention heads used. The attention heads refer to the output of one attention layer. The value for groups should be chosen such that the output channels of the attention layer is divisible by the number of groups.
 
 ##
-
-| Model                          |  AP | AP<sub>50</sub>  | AP<sub>50</sub>  |
-|--------------------------------|---|---|---|
-| Pretrained mask-rcnn           |   |   |   |
-| mask-rcnn from scratch         |   |   |   |
-| mask-rcnn with self attention  |   |   |   |
+| Model                          |                     bounding box             |                      segmentation            |
+|                                |  AP %| AP<sub>50</sub> % | AP<sub>75</sub> % |  AP %| AP<sub>50</sub> % | AP<sub>75</sub> % |
+|--------------------------------|---|---|---|---|---|---|
+| Pretrained mask-rcnn           |   |   |   |   |   |   |
+| mask-rcnn from scratch         |   |   |   |   |   |   |
+| mask-rcnn with self attention  | 0.8   | 2.8  |  0.1 |
