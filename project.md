@@ -98,7 +98,8 @@ Here the inputs <b>width</b> refer to `int(planes * (base_width / 64.)) * groups
 ##
 
 |     Model                      |  AP<sup>bb</sup> | AP<sub>50</sub><sup>bb</sup> | AP<sub>75</sub><sup>bb</sup> |  AP<sup>seg</sup> | AP<sub>50</sub><sup>seg</sup> | AP<sub>75</sub><sup>seg</sup> |
-|--------------------------------|---|---|---|---|---|---|
-| Pretrained mask-rcnn           |   |   |   |   |   |   |
-| mask-rcnn from scratch         |   |   |   |   |   |   |
-| mask-rcnn with self attention  | 0.8   | 2.8  |  0.1 |
+|------------------------------------------|-------|------|------|-------|-------|-------|
+| Pretrained mask-rcnn (10 epochs)         | 18.9  | 33.0 | 17.1 | 15.0  | 31.5  |  11.4 |
+| mask-rcnn from scratch (20 epochs)       | 1.0   | 3.2  |  0.1 |  0.7  |  2.4  |  0.1  |
+| mask-rcnn from scratch (10 epochs)       | 1.0   | 3.2  |  0.1 |  0.7  |  2.4  |  0.1  |
+| mask-rcnn with self attention (10 epochs)| 0.8   | 2.8  |  0.1 |  0.6  | 1.9   |  0.0  | 
