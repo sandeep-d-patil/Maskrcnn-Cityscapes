@@ -491,25 +491,73 @@ As can be seen from the total loss graph (loss), the loss value increases from 1
 
 ### Effect of pretraining
 Overall, the loss values obtained for the pretrained model are lower and fluctuate less than those for the model trained from scratch. The pretrained model also does not require running for more than 10 epochs to achieve comparable loss values compared to the model trained from scratch.
+
 ### Effect of self attention
 The model with self attention trained from scratch begins to show decreasing total loss (loss) values after 6 epochs, in comparison with the model without self attention which requires running for at least 10 epochs. The objectness loss also shows a general decreasing trend in comparison with the model trained from scratch without self attention which shows a more fluctuating trend. The mrcnnn_bbox_loss also does not show an increasing trend, unlike in the model without self attention.
 
 
 ### AP scores
-|     Model                      |  AP<sup>bb</sup> | AP<sub>50</sub><sup>bb</sup> | AP<sub>75</sub><sup>bb</sup> |  AP<sup>seg</sup> | AP<sub>50</sub><sup>seg</sup> | AP<sub>75</sub><sup>seg</sup> |
-|------------------------------------------|-------|------|------|-------|-------|-------|
-| Pretrained mask-rcnn (10 epochs)         | 18.9  | 33.0 | 17.1 | 15.0  | 31.5  |  11.4 |
-| mask-rcnn from scratch (20 epochs)       | 1.0   | 3.2  |  0.1 |  0.7  |  2.4  |  0.1  |
-| mask-rcnn from scratch (10 epochs)       | 1.0   | 3.2  |  0.1 |  0.7  |  2.4  |  0.1  |
-| mask-rcnn with self attention (10 epochs)| 0.8   | 2.8  |  0.1 |  0.6  | 1.9   |  0.0  |
+<table class="tg">
+<thead>
+  <tr>
+    <th class="tg-c3ow">Model</th>
+    <th class="tg-0lax">AP<sup>bb</sup></th>
+    <th class="tg-7btt">AP<sub>50</sub><sup>bb</sup></th>
+    <th class="tg-7btt">AP<sub>75</sub><sup>bb</sup></th>
+    <th class="tg-7btt">AP<sup>seg</sup></th>
+    <th class="tg-7btt">AP<sub>50</sub><sup>seg</sup></th>
+    <th class="tg-7btt">AP<sub>75</sub><sup>seg</sup></th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td class="tg-c3ow">Pretrained mask-rcnn (10 epochs)</td>
+    <td class="tg-0lax">18.9</td>
+    <td class="tg-c3ow">33.0</td>
+    <td class="tg-c3ow">17.1</td>
+    <td class="tg-c3ow">15.0</td>
+    <td class="tg-c3ow">31.5</td>
+    <td class="tg-c3ow">11.4</td>
+  </tr>
+  <tr>
+    <td class="tg-c3ow">mask-rcnn from scratch (20 epochs)</td>
+    <td class="tg-0lax">1.0</td>
+    <td class="tg-c3ow">3.2</td>
+    <td class="tg-c3ow">0.1</td>
+    <td class="tg-c3ow">0.7</td>
+    <td class="tg-c3ow">2.4</td>
+    <td class="tg-c3ow">0.1</td>
+  </tr>
+  <tr>  
+    <td class="tg-c3ow">mask-rcnn from scratch (10 epochs)</td>
+    <td class="tg-0lax">0.2</td>
+    <td class="tg-c3ow">0.6</td>
+    <td class="tg-c3ow">0.00</td>
+    <td class="tg-c3ow">0.1</td>
+    <td class="tg-c3ow">20.3</td>
+    <td class="tg-c3ow">0.00</td>
+  </tr>
+  <tr>
+    <td class="tg-c3ow">mask-rcnn with self attention (10epochs)</td>
+    <td class="tg-0lax">0.8</td>
+    <td class="tg-c3ow">2.8</td>
+    <td class="tg-c3ow">0.1</td>
+    <td class="tg-c3ow">0.6</td>
+    <td class="tg-c3ow">1.9</td>
+    <td class="tg-c3ow">0.0</td>
+  </tr>
+</tbody>
+</table>
+
+The AP values overall for both the bounding boxes and the segmentations are higher than for models pretrained from scratch. This is expected since the pre-trained model was initilized with weights after training on the COCO dataset and we have only trained our models from scratch on 500 images. The AP values obtained for the model trained with self attention show improvements over those trained without self attention from sratch for the same number of epochs. It can also be observed that to achieve comparable AP values, the mask-rcnn model without self attention requires running for 20 epochs compared to only 10 epochs for the model with self attention.
+
+## Conclusions
+We conclude that pretraining on COCO dataset leads to improved AP values compared to training from scratch. We also observe that adding self-attention convolutions in the bottleneck layers in the first resnet layer leads to comparable AP scores achieved with fewer epochs.  
 
 ## Future Work
 A third proposed experiment would be to investigate the effect of the position of the attention convolutions within the resnet model. For example, the model could be investigated with attention convolutions in only one of the 4 resnet layers at a time. Also, the replacing the initial layers (the stem) with an Attention stem can be investigated. This experiment was not performed due to GPU memory constraints in colab. An attempt was made at adding attention bottlenecks in layers 2,3 and 4. It was observed in layers 2 and 3 that the attention convolutions would result in exceeding GPU limits available. This is expected since the original resnet implementation creates 4 and 6 bottlenecks in each of those layers respectively. A similar observation was made for replacement of the stem with an attention stem. An attention bottleneck implemented in layer 4 would result in large loss values.
 
 ## Threats to validity
 Images were filtered out in 2 stages. First, images with no instances were filtered out. This could negatively impact the performance achieved by the models since the model would benefit from images with no instances and would reduce false positives. The decision to filter out these images was made to prevent errors in training and evaluation with pycoco training and evaluation functions that would rely on the presence of bounding boxes.In a second filtering stage, images with bounding boxes with an area less than a minimum area were filtered out, with some images returning no bounding boxes. For these images, one instance in the images was returned with a binary mask of zeros, a label of 0, and an area that was set to 500 pixels. It remains unclear whether returned instance is accounted for in the loss functions since background pixels should in theory not be taken into account in the loss. It was found however that these values would allow for the loss values to converge in training and were thus used. For a future implemetation, the effect of these filter stages should be thoroughly investigated.
-
-## Additional notes
-
 
 
