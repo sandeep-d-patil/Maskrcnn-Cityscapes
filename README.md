@@ -448,15 +448,7 @@ In our fist experiment, we investigate the performance of the maskrcnn model wit
 In our second experiment, we aim to investigate the effect of replacing the 3x3 convolution kernels in the first layer of the resnet model. The first layer of the resnet model consists of 3 bottleneck layers. Each bottleneck layer consists of a 1x1 convolution , a 3x3 convolution and a 1x1 convolution. The 3x3 convolutions in each of the 3 layers in the first bottleneck layer was replaced by an attention convolution as defined in [cite attention convolution code]. The model is also entirely trained from scratch. In this experiment, the performance of the model with self-attention convolution and without the self-attention convolution can be compared. Both models are entirely pretrained from scratch.
 
 ## Results
-### visualization
-The masks generated for each of the three models can be seen in the figures below.
-
-<figure align="center">
-  <img src="./images/dataset1.png" alt="predicted" style="zoom:40%;" >
-  <figcaption>MaskRCNN with pretrained model on COCO: Loss values for 30 epochs</figcaption>
-</figure>
-
-
+### Loses
 The loss values presented in the following figures are shown for the purpose of general trend visualization with smoothed values with a factor of 0.6.
 
 <figure align="center">
@@ -555,11 +547,16 @@ The model with self attention trained from scratch begins to show decreasing tot
 
 The AP values overall for both the bounding boxes and the segmentations are higher than for models pretrained from scratch. This is expected since the pre-trained model was initilized with weights after training on the COCO dataset and we have only trained our models from scratch on 500 images. The AP values obtained for the model trained with self attention show improvements over those trained without self attention from sratch for the same number of epochs. It can also be observed that to achieve comparable AP values, the mask-rcnn model without self attention requires running for 20 epochs compared to only 10 epochs for the model with self attention.
 
+### visualization
+The masks generated for each of the three models can be seen in the figures below.
+
 <figure align="center">
 <img src="./images/masks/imgpretr.jpg" alt="predcted7" style="zoom:45%;" >
 <img src="./images/masks/maskpretr.jpg" alt="prdicted8" style="zoom:40%;" >
 <figcaption>Visualization of masks from Mask RCNN with the pretrained model</figcaption>
 </figure>
+
+The pretrained model is able to capture all the details in image and segments the pixels into correct classes. The instance boundaries are more pronounced and well separated in this case.
 
 <figure align="center">
 <img src="./images/masks/selfattenimage.jpg" alt="pedicted11" style="zoom:50%;" >
@@ -567,11 +564,15 @@ The AP values overall for both the bounding boxes and the segmentations are high
 <figcaption>Visualization of masks from Mask RCNN without pretrained model</figcaption>
 </figure>
 
+When the model is trained from scratch there is a need to train with larger images and more number of epochs as the network is large and has very high trainable parameters. This can be seen in the above images. The model is able to locate the instances but is not able to capture boundary information.
+
 <figure align="center">
 <img src="./images/masks/selfattenimage.jpg" alt="pedicted11" style="zoom:50%;" >
 <img src="./images/masks/selfattenmask.jpg" alt="predited12" style="zoom:50%;" >
 <figcaption>Visualization of masks from Mask RCNN with Self-Attention Layer</figcaption>
 </figure>
+
+Visualizations of masks for Mask RCNN model with Self-Attention Layer is shown above. Comparing to the masks obtained to Mask RCNN model without pretraining the model is able to capture information slightly better , as there are lesser false positives. The former (Mask RCNN without pretraining model) is classifying more region outside the instances as instances.
 
 ## Conclusions
 We conclude that pretraining on COCO dataset leads to improved AP values compared to training from scratch. We also observe that adding self-attention convolutions in the bottleneck layers in the first resnet layer leads to comparable AP scores achieved with fewer epochs.  
