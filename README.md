@@ -5,19 +5,64 @@
 To investigate the improvement in accuracy of a Mask-RCNN model trained on Cityscapes dataset with the addition of self-attention layers for the task of instance segmentation.
 
 ### Mask RCNN Description
+Mask RCNN is a state of the art deep neural network which is used for instance segmentation. There are two main parts of the neural network: the backbone and the head. The backbone is responsible for extracting features from the input images. The backbones that can be implemented in Mask RCNN include ResNet 50, FPN or ResNext 101 [[Kaiming et al.](https://arxiv.org/pdf/1703.06870.pdf)]. The features output from the backbone are taken as input in the head, which is composed of two stages. In the first stage, RPN or Region Proposal network scans the output of the backbone layer and it proposes anchor boxes which are bounding boxes with predefined locations and scales relative to images. At the second stage, the neural network scans these region proposed areas and generates object classes, bounding boxes and masks. This stage is called ROI Align. [[LINK](https://medium.com/@alittlepain833/simple-understanding-of-mask-rcnn-134b5b330e95#:~:text=Mask%20RCNN%20is%20a%20deep,two%20stages%20of%20Mask%20RCNN.)]
+
+<p align="center">
+  <img src="./images/Screenshot from 2020-06-17 13-33-49.png" alt="architecture" style="zoom:60%;" >
+</p>
+
+The mask rcnn backbone currently used is ResNet 50, as it is adaptable to the addition of a self attention layer( which will be explained in later section) .
+
+```
+model = torchvision.models.detection.maskrcnn_resnet50_fpn(pretrained=False)
+```
+
+The pretrained model obtained here is pretrained on the COCO 2017 dataset. When `pretrained = True` only the last layer of the model will be fine-tuned to particular classes, otherwise finetune the whole model. Different backbones can be loaded here. A custom backbone can also be created 
+
+```
+in_features = model.roi_heads.box_predictor.cls_score.in_features
+```
+
+
+After obtaining the anchor boxes, the region proposal network tries to tighten the centers of these boxes around the target. This is done through the process of bounding box regression. After the bounding boxes are obtained, the IOU (intersection over union) with the ground truth values is calculated and classification labels are assigned for such boxes. Box_predictor here is the module that takes the output of bounding boxes and returns the classification labels and distance between the ground truth center and predicted center which is called bounding box regression delta. This distance is then used to calculate the loss values for backpropagation. 
+
+The model takes in the input channels from the in_features and the num_classes which is provided specifically for datasets. For Cityscapes dataset, the number of classes = 11 including the background. These classes correspond to instances of interest (traffic participants). The FastRCNNPredictor provides the class scores and bounding box regression deltas over the predicted values.
+
+```
+model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
+```
+
+```
+in_features_mask = model.roi_heads.mask_predictor.conv5_mask.in_channels
+hidden_layer = 256
+```
+
+After the bounding boxes and their labels are obtained, the masks over the instances of the bounding boxes are calculated. The conv5 mask applies a 2D transposed convolution over the input image.
+
+```
+
+model.roi_heads.mask_predictor = MaskRCNNPredictor(in_features_mask,
+														hidden_layer,num_classes)
+```
+
+This returns the masks for the predicted instances in the image.
+rpn_class_loss = RPN anchor classifier loss
+rpn_bbox_loss = RPN bounding box loss graph
+mrcnn_class_loss = loss for the classifier head of Mask R-CNN
+mrcnn_bbox_loss = loss for Mask R-CNN bounding box refinement
+mrcnn_mask_loss
 
 #### Resnet with FPN backbone
 Resnet, also known as Residual Networks [Kaiming et al](https://arxiv.org/pdf/1512.03385.pdf), are very helpful in learning the weights over long range neural networks and solves the problem of vanishing gradients. Deep neural networks are essential in capturing more information from the input images. The addition of the 'shortcut connections' where the input for a particular layer is concatenated with the output of the same layer. The shortcut connections perform the  This helps the network to optimize easily when compared to just a stack of layers. ResNet 50 layer is used as the backbone for the MaskRCNN considering its size and capabilities. 
 
-The layers of ResNet architectures are shown in the diagram below. The bottleneck layers are a stack of 3 convolutional layers which are 1x1, 3x3, 1x1 convolutions. Here 1x1 convolutions are responsible for reducing and then increasing the dimensions of the inputs repectively. In the experiments for the current project replacement of Bottleneck layers with Attention layers from Stand alone self-attentions [[Ashish](https://arxiv.org/pdf/1706.03762.pdf )], which will be discussed in the further sections. from the StandThe output from the ResNet layer is then fed into the FPN layer 
+The layers of ResNet architectures are shown in the diagram below. The bottleneck layers are a stack of 3 convolutional layers which are 1x1, 3x3, 1x1 convolutions. Here 1x1 convolutions are responsible for reducing and then increasing the dimensions of the inputs repectively. In the experiments for the current project replacement of Bottleneck layers with Attention layers from Stand alone self-attentions [[Ashish](https://arxiv.org/pdf/1706.03762.pdf )], which will be discussed in the further sections. from the StandThe output from the ResNet layer is then fed into the FPN layer.
 
-FPN uses a top down architecture with lateral connections to build a feature pyramid from a single scale input as shown in the figure above. The 
+FPN uses a top down architecture with lateral connections to build a feature pyramid from a single scale input as shown in the figure below [ref](https://github.com/mapbox/robosat/issues/60). How is the experience while typing on the laptop keyboard. I would say it is vey pleasant while the key press is not that hard. It makes a alarming bang sound when typing , This might cause it to break . Hence need to proceed to typing on the other kkeybaords.
 
 <p align="center">
   <img width="640" height="480" src="./images/resnetwithfpn.jpg" alt="SelfAttention" >
 </p>
 
-https://github.com/mapbox/robosat/issues/60
 
 #### Self Attention
 Self attention [[Ashish](https://arxiv.org/pdf/1706.03762.pdf )] [[Prajit](https://arxiv.org/pdf/1906.05909.pdf)] is a type of attention mechanism that relates different input pixel positions to learn a representation of the input sequence. Given a pixel x<sub>ij</sub>, a memory block is generated which is composed of pixels in positions ab that are in the neighborhood of the pixel x<sub>ij</sub>. The following formula is used to compute the pixel output.
@@ -113,6 +158,21 @@ self.conv2 = AttentionConv(width, width, kernel_size=7, padding=3, groups=8)
 
 Here the inputs <b>width</b> refer to `int(planes * (base_width / 64.)) * groups` which takes in the downscaled input from the conv1x1 layer. The value of width in the first layer of the bottleneck is 64. A lower spatial size of the kernel (kernel_size=3) did not capture the information and improvements are seen by increasing the spatial size. A kernel size of 7 was found to be more appropriate according the paper [[Ashish](https://arxiv.org/pdf/1706.03762.pdf )]. The padding size is chosen to be 3 {Why?} and the groups denote the number of attention heads used. The attention heads refer to the output of one attention layer. The value for groups should be chosen such that the output channels of the attention layer is divisible by the number of groups.
 
+### Losses
+During training, different losses are computed and are : classification loss, regression loss for rpn and R-CNN, mask loss.The regression loss in case of rpn and rcnn is calculated using smooth L1 loss, which is regular L1 loss at all the places except at zero. L2 loss is used to smooth the loss at zero. 
+
+```
+**psuedocode
+if abs(d) < 1/sigma**2
+loss = (d*sigma)**2 /2
+else
+loss = abs(d) — 1/(2*sigma**2)
+```
+
+In case of classifications the cross entropy loss is used for both rpn and rcnn.
+
+During training, different losses are computed and are: loss, rpn_class_loss, rpn_bbox_loss, mrcnn_class_loss, mrcnn_bbox_loss and mrcnn_mask_loss. loss is the summation of the other 5 loss values. The classification losses reflect the model's confidence in predicting the true class. mrcnn_class_loss is a cross-entropy loss computed for all instances in an image. rpn_class_loss is computed based on whether the generated anchors belong to the background or foreground. The bounding box losses reflect how close the true box parameters are from the predicted boxes. In the case of rpn_bbox_loss, the loss value indicates the ability of the model to locate objects within an image. In the case of mrcnn_bbox_loss, the loss indicates the ability of the model to precisely fit the bounding boxes around objects detected in the image. The mrcnn_mask_loss is a binary cross-entropy loss. A binary mask is generated for each bounding box and the loss is computed by comparing the ground truth binary mask for the true class with that for the generated binary mask for the same class. The loss indicates the ability of the model to generate a mask that falls over only those pixels which belong to the instance in the foreground. 
+
 
 ### Dataset Description
 
@@ -140,68 +200,6 @@ The target information is obtained from polygons in JSON files or InstanceId ima
 5. **iscrowd** (UInt8Tensor[N]): specifies whether a segmentation is for an object or groups of objects.
 
 Data-preprocessing must be done to obtain label ids, which must be filtered out for traffic participants. Binary masks must also be produced for every instance in an image. Images with no instances must also be ignored.
- ### Model Description
-Mask RCNN is a state of the art deep neural network which is used for instance segmentation. There are two main parts of the neural network: the backbone and the head. The backbone is responsible for extracting features from the input images. The backbones that can be implemented in Mask RCNN include ResNet 50, FPN or ResNext 101 [[Kaiming et al.](https://arxiv.org/pdf/1703.06870.pdf)]. The features output from the backbone are taken as input in the head, which is composed of two stages. In the first stage, RPN or Region Proposal network scans the output of the backbone layer and it proposes anchor boxes which are bounding boxes with predefined locations and scales relative to images. At the second stage, the neural network scans these region proposed areas and generates object classes, bounding boxes and masks. This stage is called ROI Align. [[LINK](https://medium.com/@alittlepain833/simple-understanding-of-mask-rcnn-134b5b330e95#:~:text=Mask%20RCNN%20is%20a%20deep,two%20stages%20of%20Mask%20RCNN.)]
-
-<p align="center">
-  <img src="./images/Screenshot from 2020-06-17 13-33-49.png" alt="architecture" style="zoom:60%;" >
-</p>
-
-The mask rcnn backbone currently used is ResNet 50, as it is adaptable to the addition of a self attention layer( which will be explained in later section) .
-
-```
-model = torchvision.models.detection.maskrcnn_resnet50_fpn(pretrained=False)
-```
-
-The pretrained model obtained here is pretrained on the COCO 2017 dataset. When `pretrained = True` only the last layer of the model will be fine-tuned to particular classes, otherwise finetune the whole model. Different backbones can be loaded here. A custom backbone can also be created 
-
-```
-in_features = model.roi_heads.box_predictor.cls_score.in_features
-```
-
-
-After obtaining the anchor boxes, the region proposal network tries to tighten the centers of these boxes around the target. This is done through the process of bounding box regression. After the bounding boxes are obtained, the IOU (intersection over union) with the ground truth values is calculated and classification labels are assigned for such boxes. Box_predictor here is the module that takes the output of bounding boxes and returns the classification labels and distance between the ground truth center and predicted center which is called bounding box regression delta. This distance is then used to calculate the loss values for backpropagation. 
-
-The model takes in the input channels from the in_features and the num_classes which is provided specifically for datasets. For Cityscapes dataset, the number of classes = 11 including the background. These classes correspond to instances of interest (traffic participants). The FastRCNNPredictor provides the class scores and bounding box regression deltas over the predicted values.
-
-```
-model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
-```
-
-```
-in_features_mask = model.roi_heads.mask_predictor.conv5_mask.in_channels
-hidden_layer = 256
-```
-
-After the bounding boxes and their labels are obtained, the masks over the instances of the bounding boxes are calculated. The conv5 mask applies a 2D transposed convolution over the input image.
-
-```
-
-model.roi_heads.mask_predictor = MaskRCNNPredictor(in_features_mask,
-														hidden_layer,num_classes)
-```
-
-This returns the masks for the predicted instances in the image.
-rpn_class_loss = RPN anchor classifier loss
-rpn_bbox_loss = RPN bounding box loss graph
-mrcnn_class_loss = loss for the classifier head of Mask R-CNN
-mrcnn_bbox_loss = loss for Mask R-CNN bounding box refinement
-mrcnn_mask_loss
-
-### Losses
-During training, different losses are computed and are : classification loss, regression loss for rpn and R-CNN, mask loss.The regression loss in case of rpn and rcnn is calculated using smooth L1 loss, which is regular L1 loss at all the places except at zero. L2 loss is used to smooth the loss at zero. 
-
-```
-**psuedocode
-if abs(d) < 1/sigma**2
-loss = (d*sigma)**2 /2
-else
-loss = abs(d) — 1/(2*sigma**2)
-```
-
-In case of classifications the cross entropy loss is used for both rpn and rcnn.
-
-During training, different losses are computed and are: loss, rpn_class_loss, rpn_bbox_loss, mrcnn_class_loss, mrcnn_bbox_loss and mrcnn_mask_loss. loss is the summation of the other 5 loss values. The classification losses reflect the model's confidence in predicting the true class. mrcnn_class_loss is a cross-entropy loss computed for all instances in an image. rpn_class_loss is computed based on whether the generated anchors belong to the background or foreground. The bounding box losses reflect how close the true box parameters are from the predicted boxes. In the case of rpn_bbox_loss, the loss value indicates the ability of the model to locate objects within an image. In the case of mrcnn_bbox_loss, the loss indicates the ability of the model to precisely fit the bounding boxes around objects detected in the image. The mrcnn_mask_loss is a binary cross-entropy loss. A binary mask is generated for each bounding box and the loss is computed by comparing the ground truth binary mask for the true class with that for the generated binary mask for the same class. The loss indicates the ability of the model to generate a mask that falls over only those pixels which belong to the instance in the foreground. 
 
 
 ## Experimental setup
