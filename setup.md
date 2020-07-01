@@ -1,4 +1,7 @@
 # File setup
+Clone the repository into the work directory using 
+`git clone https://github.com/sandeeprockstar/Maskrcnn-Cityscapes.git`
+
 
 ## Required libraries are:
 ```libraries
