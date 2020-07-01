@@ -51,14 +51,6 @@ model.roi_heads.mask_predictor = MaskRCNNPredictor(in_features_mask,
 
 This returns the masks for the predicted instances in the image.
 
-```losses
-rpn_class_loss = RPN anchor classifier loss
-rpn_bbox_loss = RPN bounding box loss graph
-mrcnn_class_loss = loss for the classifier head of Mask R-CNN
-mrcnn_bbox_loss = loss for Mask R-CNN bounding box refinement
-mrcnn_mask_loss
-```
-
 #### Resnet with FPN backbone
 Resnet, also known as Residual Networks [Kaiming et al](https://arxiv.org/pdf/1512.03385.pdf), are very helpful in learning the weights over long range neural networks and solves the problem of vanishing gradients. Deep neural networks are essential in capturing more information from the input images. The addition of the 'shortcut connections' where the input for a particular layer is concatenated with the output of the same layer. The shortcut connections perform the  This helps the network to optimize easily when compared to just a stack of layers. ResNet 50 layer is used as the backbone for the MaskRCNN considering its size and capabilities. 
 
