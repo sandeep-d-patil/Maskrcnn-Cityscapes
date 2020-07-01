@@ -3,7 +3,7 @@
 
 Authors: Mohamed Madi () Sandeep Patil(4861213) - s.patil-1@student.tudelft.nl
 ## Introduction
-Mask RCNN is a state of the art instance segmentation network, which focuses on pixel level classification and outputs the bounding boxes, classes and masks. To reduce the number of parameters and to improve the efficiency of the network we introduce the self attention layer to the Mask RCNN network. Self Attention is a attention mechanism which relates different positions of the same image in order to compute/learn the representation of the image [[REF]](https://lilianweng.github.io/lil-log/2018/06/24/attention-attention.html#self-attention). We investigate the improvement in the accuracy of a Mask-RCNN model trained on Cityscapes dataset with the addition of self-attention layers for the task of instance segmentation.
+Mask RCNN is a state of the art instance segmentation network, which focuses on pixel level classification and outputs the bounding boxes, classes and masks. we introduce the self attention layer to the Mask RCNN network to reduce the number of parameters and to improve the efficiency of the network. Self Attention is a attention mechanism which relates different positions of the same image in order to compute/learn the representation of the image [[REF]](https://lilianweng.github.io/lil-log/2018/06/24/attention-attention.html#self-attention). We investigate the improvement in the accuracy of a Mask-RCNN model trained on Cityscapes dataset with the addition of self-attention layers for the task of instance segmentation.
 
 ### Mask RCNN Description
 
