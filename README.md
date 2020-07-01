@@ -11,7 +11,7 @@ To investigate the improvement in accuracy of a Mask-RCNN model trained on Citys
 The backbone is responsible for extracting features from the input images. The backbones that can be implemented in Mask RCNN include ResNet 50, FPN or ResNext 101 [[Kaiming et al.](https://arxiv.org/pdf/1703.06870.pdf)]. The features output from the backbone are taken as input in the head, which is composed of two stages. In the first stage, RPN or Region Proposal network scans the output of the backbone layer and it proposes anchor boxes which are bounding boxes with predefined locations and scales relative to images. At the second stage, the neural network scans these region proposed areas and generates object classes, bounding boxes and masks. This stage is called ROI Align. [[LINK](https://medium.com/@alittlepain833/simple-understanding-of-mask-rcnn-134b5b330e95#:~:text=Mask%20RCNN%20is%20a%20deep,two%20stages%20of%20Mask%20RCNN.)]
 
 <p align="center">
-  <img src="./images/Screenshot from 2020-06-17 13-33-49.png" alt="architecture" style="zoom:60%;" >
+  <img src="./images/Screenshot from 2020-06-17 13-33-49.png" alt="architecture" style="zoom:40%;" >
 </p>
 
 The mask rcnn backbone currently used is ResNet 50, as it is adaptable to the addition of a self attention layer( which will be explained in later section) .
