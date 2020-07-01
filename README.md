@@ -7,7 +7,10 @@ To investigate the improvement in accuracy of a Mask-RCNN model trained on Citys
 ### Mask RCNN Description
 
 #### Resnet with FPN backbone
-Resnet, also known as Residual Networks [Kaiming et al](https://arxiv.org/pdf/1512.03385.pdf)
+Resnet, also known as Residual Networks [Kaiming et al](https://arxiv.org/pdf/1512.03385.pdf), are very helpful in learning the weights over long range neural networks and solves the problem of vanishing gradients. Deep neural networks are essential in capturing more information from the input images. The addition of the 'shortcut connections' where the input for a particular layer is concatenated with the output of the same layer. The shortcut connections perform the  This helps the network to optimize easily when compared to just a stack of layers. ResNet 50 layer is used as the backbone for the MaskRCNN considering its size and capabilities. 
+
+The layers of ResNet architectures are shown in the diagram below. The bottleneck layers are a stack of 3 convolutional layers which are 1x1, 3x3, 1x1 convolutions. Here 1x1 convolutions are responsible for reducing and then increasing the dimensions of the inputs repectively. In the experiments for the current project replacement of Bottleneck layers with Attention layers from Stand alone self-attentions [[Ashish](https://arxiv.org/pdf/1706.03762.pdf )], which will be discussed in the further sections. from the StandThe output from the ResNet layer is then fed into the FPN layer 
+
 FPN uses a top down architecture with lateral connections to build a feature pyramid from a single scale input as shown in the figure above. The 
 
 <p align="center">
