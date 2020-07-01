@@ -8,10 +8,13 @@ To investigate the improvement in accuracy of a Mask-RCNN model trained on Citys
 
 Cityscapes [[Cordts et. al](https://arxiv.org/abs/1604.01685)] is a large-scale dataset and benchmarking tool that consists of images acquired of urban street scenes from a moving vehicle in 50 different cities with dense annotations for pixel-level, instance-level and panoptic labeling tasks. The dataset consists of 30 classes including person,car,bus,road and sky, of which only 10 classes are considered instances or traffic participants. The dataset consists of 5000 images with fine annotations and 20 000 images with course annotations. Of the 5000 images with fine annotations, 2975 images are assigned as train, 500 as validation and the remainder consists of test images with annotations withheld for benchmarking purposes. An example of a train image and its corresponding annotated label is shown in Figure 1.
 
+<p align="center">
+  <img src="./images/frankfurt_000001_027325_leftImg8bit.png" alt="Frankfurt" style="zoom:60%;" >
+</p>
 
-<img src="./images/frankfurt_000001_027325_leftImg8bit.png" alt="Frankfurt" style="zoom:60%;" />
-
-<img src="./images/frankfurt_000001_027325_gtFine_color.png" alt="Frankfurt_gt" style="zoom:60%;" />
+<p align="center">
+  <img src="./images/frankfurt_000001_027325_gtFine_color.png" alt="Frankfurt_gt" style="zoom:60%;" >
+</p>
 
 The target information is obtained from polygons in JSON files or InstanceId images that are provided with the dataset. In order to evaluate the and train a Mask-RCNN model with COCO evaluation metrics, the dataset must be loaded in the COCO annotation format for object detection and segmentation. This requires images and targets to be provided in the following format:
 
@@ -94,14 +97,17 @@ Self attention [[Ashish](https://arxiv.org/pdf/1706.03762.pdf )] [[Prajit](https
 
 <img src="https://render.githubusercontent.com/render/math?math=y_{ij} = \sum_{a,b Nk(i,j)} softmax_{ab}(q^T_{ij} * k_{ab})*v_{ab}">
 
-
 Where q<sub>ij</sub>, k<sub>ab</sub> and v<sub>ab</sub> correspond to queries, keys and values respectively. These values are obtained by transformation learned weight matrices W<sub>Q</sub>, W<sub>K</sub> and W<sub>V</sub>. This computation is done for every pixel value in the memory block. Multiple-attention heads are used where N weight matrices are learned for N groups of pixel features, by dividing the pixel features along the depth dimension. The output of every group or head is then concatenated to produce the final output. Figure x shows an example of the computation performed by a local attention layer.
 
-<img src="./images/Screenshot from 2020-06-17 13-09-00.png" alt="SelfAttention" style="zoom:30%;" />
+<p align="center">
+  <img src="./images/Screenshot from 2020-06-17 13-09-00.png" alt="SelfAttention" style="zoom:30%;" >
+</p>
 
 A local attention layer with kernel size 3. Figure by [Prajit] To encode positional information relative attention is used. The relative distance between pixels in the neighborhood of (i,j) and pixel (i,j) is computed in terms of row and column offsets. An example of relative distance computations is shown in Figure x.
 
-<img src="./images/Screenshot from 2020-06-17 13-09-21.png" alt="Pixels" style="zoom:60%;" />
+<p align="center">
+  <img src="./images/Screenshot from 2020-06-17 13-09-21.png" alt="Pixels" style="zoom:60%;" >
+</p>
 
 Relative distance computation in row and column offsets, relative to the highlighted pixel. Figure by [Prajit]
 
@@ -349,9 +355,11 @@ In our second experiment, we aim to investigate the effect of replacing the 3x3 
 
 ## Results
 With the pretrained model from coco dataset 2017, We trained the images for 30 epochs and the predicted mask can be seen below:
+<p align="center">
+  <img src="./images/dataset1.png" alt="predicted" style="zoom:40%;" >
+</p>
 
-<img src="./images/dataset1.png" alt="predicted" style="zoom:10%;" />
-
+width="460" height="300" 
 ## Future Work
 A third proposed experiment would be to investigate the effect of the position of the attention convolutions within the resnet model. For example, the model could be investigated with attention convolutions in only one of the 4 resnet layers at a time. Also, the replacing the initial layers (the stem) with an Attention stem can be investigated. This experiment was not performed due to GPU memory constraints in colab. An attempt was made at adding attention bottlenecks in layers 2,3 and 4. It was observed in layers 2 and 3 that the attention convolutions would result in exceeding GPU limits available. This is expected since the original resnet implementation creates 4 and 6 bottlenecks in each of those layers respectively. A similar observation was made for replacement of the stem with an attention stem. An attention bottleneck implemented in layer 4 would result in large loss values.
 
