@@ -3,7 +3,7 @@
 </h1>
 
 <h3 align="center">
-<b>Authors: Mohamed Madi () Sandeep Patil(4861213) - s.patil-1@student.tudelft.nl </b>
+<b>Authors: Mohamed Madi (5136539) Sandeep Patil(4861213) - s.patil-1@student.tudelft.nl </b>
 </h3>
 
 ## Introduction
@@ -448,13 +448,17 @@ In our fist experiment, we investigate the performance of the maskrcnn model wit
 In our second experiment, we aim to investigate the effect of replacing the 3x3 convolution kernels in the first layer of the resnet model. The first layer of the resnet model consists of 3 bottleneck layers. Each bottleneck layer consists of a 1x1 convolution , a 3x3 convolution and a 1x1 convolution. The 3x3 convolutions in each of the 3 layers in the first bottleneck layer was replaced by an attention convolution as defined in [cite attention convolution code]. The model is also entirely trained from scratch. In this experiment, the performance of the model with self-attention convolution and without the self-attention convolution can be compared. Both models are entirely pretrained from scratch.
 
 ## Results
-With the pretrained model from coco dataset 2017, We trained the images for 30 epochs and the predicted mask can be seen below:
+### visualization
+The masks generated for each of the three models can be seen in the figures below.
+
 <figure align="center">
   <img src="./images/dataset1.png" alt="predicted" style="zoom:40%;" >
-  <figcaption>MaskRCNN with pretrained model: Loss values for 10 epochs</figcaption>
+  <figcaption>MaskRCNN with pretrained model on COCO: Loss values for 30 epochs</figcaption>
 </figure>
 
+
 The loss values presented in the following figures are shown for the purpose of general trend visualization with smoothed values with a factor of 0.6.
+
 <figure align="center">
 <img src="./images/pretrainedtrue/lossvalue1.jpg" alt="predicted7" style="zoom:40%;" >
 <img src="./images/pretrainedtrue/lossclass1.jpg" alt="predicted8" style="zoom:40%;" >
