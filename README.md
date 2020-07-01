@@ -67,8 +67,6 @@ FPN uses a top down architecture with lateral connections to build a feature pyr
   <img width="640" height="480" src="./images/resnetwithfpn.jpg" alt="SelfAttention" >
 </p>
 
-{Add explanation about rpn and mask generation}
-
 #### Self Attention
 Self attention [[Ashish](https://arxiv.org/pdf/1706.03762.pdf )] [[Prajit](https://arxiv.org/pdf/1906.05909.pdf)] is a type of attention mechanism that relates different input pixel positions to learn a representation of the input sequence. Given a pixel x<sub>ij</sub>, a memory block is generated which is composed of pixels in positions ab that are in the neighborhood of the pixel x<sub>ij</sub>. The following formula is used to compute the pixel output.
 
