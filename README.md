@@ -107,7 +107,8 @@ Replacing attention layer with convolution operation at the stem layer poses a c
 Attention convolution layer is as shown below.
 ```AttentionConv
 class AttentionConv(nn.Module):
-    def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0, groups=1, bias=False):
+    def __init__(self, in_channels, out_channels, kernel_size, 
+    				stride=1, padding=0, groups=1, bias=False):
         super(AttentionConv, self).__init__()
         self.out_channels = out_channels
         self.kernel_size = kernel_size
@@ -118,8 +119,10 @@ class AttentionConv(nn.Module):
         assert self.out_channels % self.groups == 0, 
 		"out_channels should be divided by groups. (example: out_channels: 40, groups: 4)"
 
-        self.rel_h = nn.Parameter(torch.randn(out_channels // 2, 1, 1, kernel_size, 1), requires_grad=True)
-        self.rel_w = nn.Parameter(torch.randn(out_channels // 2, 1, 1, 1, kernel_size), requires_grad=True)
+        self.rel_h = nn.Parameter(torch.randn(out_channels // 
+						2, 1, 1, kernel_size, 1), requires_grad=True)
+        self.rel_w = nn.Parameter(torch.randn(out_channels // 
+						2, 1, 1, 1, kernel_size), requires_grad=True)
 
         self.key_conv = nn.Conv2d(in_channels, out_channels, kernel_size=1, bias=bias)
         self.query_conv = nn.Conv2d(in_channels, out_channels, kernel_size=1, bias=bias)
