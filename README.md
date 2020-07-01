@@ -5,6 +5,14 @@
 To investigate the improvement in accuracy of a Mask-RCNN model trained on Cityscapes dataset with the addition of self-attention layers for the task of instance segmentation.
 
 ### Mask RCNN Description
+
+#### Resnet with FPN backbone
+Resnet is 
+FPN uses a top down architecture with lateral connections to build a feature pyramid from a single scale input as shown in the figure above. The 
+
+https://github.com/mapbox/robosat/issues/60
+
+#### Self Attention
 Self attention [[Ashish](https://arxiv.org/pdf/1706.03762.pdf )] [[Prajit](https://arxiv.org/pdf/1906.05909.pdf)] is a type of attention mechanism that relates different input pixel positions to learn a representation of the input sequence. Given a pixel x<sub>ij</sub>, a memory block is generated which is composed of pixels in positions ab that are in the neighborhood of the pixel x<sub>ij</sub>. The following formula is used to compute the pixel output.
 
 <img src="https://render.githubusercontent.com/render/math?math=y_{ij} = \sum_{a,b Nk(i,j)} softmax_{ab}(q^T_{ij} * k_{ab})*v_{ab}">
