@@ -9,9 +9,8 @@
 ## Introduction
 Mask RCNN is a state of the art instance segmentation network, which focuses on pixel level classification and outputs the bounding boxes, classes and masks. we introduce the self attention layer to the Mask RCNN network to reduce the number of parameters and to improve the efficiency of the network. Self Attention is a attention mechanism which relates different positions of the same image in order to compute/learn the representation of the image [[REF]](https://lilianweng.github.io/lil-log/2018/06/24/attention-attention.html#self-attention). We investigate the improvement in the accuracy of a Mask-RCNN model trained on Cityscapes dataset with the addition of self-attention layers for the task of instance segmentation.
 
-### Mask RCNN Description
-
-#### Overview
+## Mask RCNN Description
+### Overview
 Mask RCNN comprises of two stages, the <b>first stage</b> deals with the region proposals, which scans the feature pyramid network (FPN) (discussed in detail in further sections) and proposes regions which containing the object. Once the features are obtained in this stage they are confined to their respective positions in the image through the Anchor Boxes. Anchor boxes are a set of boxes which have predefined locations and sizes on the image. The classes and bouding boxes are assigned to these anchor boxes according to IOU (Intersection over Union) value. This task is performed by the network called Region Proposal Network (RPN). 
 
 The <b>second stage</b> takes the output of region proposal network and calculates the bounding boxes, objectness scores and masks using ROIAlign [[Georgia et al]](https://arxiv.org/pdf/1703.06870.pdf). ROI Align extracts a small feature map from region of interest obtained in the first stage of the network. It uses bilinear interpolation to preserve the features from the input. Both of these stages obtain a set of input from the backbone layer directly. This setup is shown in the figure below [[REF](https://medium.com/@alittlepain833/simple-understanding-of-mask-rcnn-134b5b330e95#:~:text=Mask%20RCNN%20is%20a%20deep,two%20stages%20of%20Mask%20RCNN.)]. The backbone is responsible for extracting features from the input images. The backbones that can be implemented in Mask RCNN include ResNet 50, FPN or ResNext 101 [[Kaiming et al.](https://arxiv.org/pdf/1703.06870.pdf)]. The backbone architecture is discussed in the further section.
@@ -56,7 +55,7 @@ model.roi_heads.mask_predictor = MaskRCNNPredictor(in_features_mask,
 
 This returns the masks for the predicted instances in the image.
 
-#### Resnet with FPN backbone
+### Resnet with FPN backbone
 Resnet, also known as Residual Networks [Kaiming et al](https://arxiv.org/pdf/1512.03385.pdf), are very helpful in learning the weights over long range neural networks and solves the problem of vanishing gradients. Deep neural networks are essential in capturing more information from the input images. The addition of the 'shortcut connections' where the input for a particular layer is concatenated with the output of the same layer. The shortcut connections perform the  This helps the network to optimize easily when compared to just a stack of layers. ResNet 50 layer is used as the backbone for the MaskRCNN considering its size and capabilities. 
 
 The layers of ResNet architectures are shown in the diagram below. The bottleneck layers are a stack of 3 convolutional layers which are 1x1, 3x3, 1x1 convolutions. Here 1x1 convolutions are responsible for reducing and then increasing the dimensions of the inputs repectively. In the experiments for the current project replacement of Bottleneck layers with Attention layers from Stand alone self-attentions [[Ashish](https://arxiv.org/pdf/1706.03762.pdf )], which will be discussed in the further sections. from the StandThe output from the ResNet layer is then fed into the FPN layer.
@@ -67,7 +66,7 @@ FPN uses a top down architecture with lateral connections to build a feature pyr
   <img width="640" height="480" src="./images/resnetwithfpn.jpg" alt="SelfAttention" >
 </p>
 
-#### Self Attention
+### Self Attention
 Self attention [[Ashish](https://arxiv.org/pdf/1706.03762.pdf )] [[Prajit](https://arxiv.org/pdf/1906.05909.pdf)] is a type of attention mechanism that relates different input pixel positions to learn a representation of the input sequence. Given a pixel x<sub>ij</sub>, a memory block is generated which is composed of pixels in positions ab that are in the neighborhood of the pixel x<sub>ij</sub>. The following formula is used to compute the pixel output.
 
 <p align="center">
