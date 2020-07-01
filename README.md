@@ -15,13 +15,13 @@ The second stage takes the output of region proposal network and calculates the 
   <img src="./images/Screenshot from 2020-06-17 13-33-49.png" alt="architecture" style="zoom:40%;" >
 </p>
 
-The mask rcnn backbone currently used is ResNet 50 wiht FPN (Feature Pyramid Network), as it is adaptable to the addition of a self attention layer( which will be explained in later section) .
+The mask rcnn backbone currently used is ResNet 50 with FPN (Feature Pyramid Network), as it is adaptable to the addition of a self attention layer.
 
 ```
 model = torchvision.models.detection.maskrcnn_resnet50_fpn(pretrained=False)
 ```
 
-The pretrained model obtained here is pretrained on the COCO 2017 dataset. When `pretrained = True` only the last layer of the model will be fine-tuned to particular classes, otherwise finetune the whole model. Different backbones can be loaded here. A custom backbone can also be created 
+The pretrained model when `pretrained=true` obtained here is pretrained on the COCO 2017 dataset. When `pretrained = True` only the last layer of the model will be fine-tuned to particular classes, otherwise finetune the whole model. Different backbones can be loaded here. A custom backbone can also be created 
 
 ```
 in_features = model.roi_heads.box_predictor.cls_score.in_features
