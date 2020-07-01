@@ -454,16 +454,17 @@ With the pretrained model from coco dataset 2017, We trained the images for 30 e
   <figcaption>MaskRCNN with pretrained model: Loss values for 10 epochs</figcaption>
 </figure>
 
+The loss values presented in the following figures are shown for the purpose of general trend visualization with smoothed values with a factor of 0.6.
 <figure align="center">
-<img src="./selfattentionimages/overall_loss.JPG" alt="predicted13" style="zoom:20%;" >
-<img src="./selfattentionimages/loss_classifier.JPG" alt="predicted14" style="zoom:20%;" >
-<img src="./selfattentionimages/loss_mask.JPG" alt="predicted15" style="zoom:20%;" >
-<img src="./selfattentionimages/loss_objectness.JPG" alt="predicted16" style="zoom:20%;" >
-<img src="./selfattentionimages/loss_rpn_box_reg.JPG" alt="predicted17" style="zoom:20%;" >
-<img src="./selfattentionimages/loss_box_reg.JPG" alt="predicted18" style="zoom:20%;" >
-<figcaption>MaskRCNN model with Self Attention layer: Loss values for 10 epochs</figcaption>
+<img src="./images/pretrainedtrue/lossvalue1.jpg" alt="predicted7" style="zoom:40%;" >
+<img src="./images/pretrainedtrue/lossclass1.jpg" alt="predicted8" style="zoom:40%;" >
+<img src="./images/pretrainedtrue/lossmask1.jpg" alt="predicted9" style="zoom:40%;" >
+<img src="./images/pretrainedtrue/lossobject1.jpg" alt="predicted10" style="zoom:40%;" >
+<img src="./images/pretrainedtrue/lossrpnboxreg1.jpg" alt="predicted11" style="zoom:40%;" >
+<img src="./images/pretrainedtrue/lossboxreg1.jpg" alt="predicted12" style="zoom:40%;" >
+<figcaption>MaskRCNN with pretrained model: Loss values for 10 epochs</figcaption>
 </figure>
-As can be seen from the total loss graph, the loss value increases from 1 epoch to 6 epochs, after which it reaches a minimum at 9 epochs. The maskrcnn_classifier_loss follows a similar trend. The maskrcnn_mask_loss and maskrcnn_bbox_loss (objectness loss) values show a general decreasing trend. 
+The loss values show a general increasing trend. However, the loss values presented are after 1 epoch and are lower than the initial computed losses. The loss values obtained for the total loss (loss) range from 1-2 and remain within those bounds. 
 
 <figure align="center">
 <img src="./images/resnetbacknopretr/loss_value.jpg" alt="predicted1" style="zoom:40%;" >
@@ -474,16 +475,24 @@ As can be seen from the total loss graph, the loss value increases from 1 epoch 
 <img src="./images/resnetbacknopretr/loss_box_reg.jpg" alt="predicted6" style="zoom:40%;" >
 <figcaption>MaskRCNN without pretrained model: Loss values for 17 epochs</figcaption>
 </figure>
+For the total loss graph (loss), the loss values increase until 10 epochs, after which the loss values begin to decrease. The maskrcnn_classifier_loss follows a similar trend. The rpn_class_loss (objectness loss) and rpn_bbox_loss show a general fluctuating trend. The mrcnn-bbox_loss shows an intial increase until 10 epochs and shows a fluctuating loss until 17 epochs.
 
 <figure align="center">
-<img src="./images/pretrainedtrue/lossvalue1.jpg" alt="predicted7" style="zoom:40%;" >
-<img src="./images/pretrainedtrue/lossclass1.jpg" alt="predicted8" style="zoom:40%;" >
-<img src="./images/pretrainedtrue/lossmask1.jpg" alt="predicted9" style="zoom:40%;" >
-<img src="./images/pretrainedtrue/lossobject1.jpg" alt="predicted10" style="zoom:40%;" >
-<img src="./images/pretrainedtrue/lossrpnboxreg1.jpg" alt="predicted11" style="zoom:40%;" >
-<img src="./images/pretrainedtrue/lossboxreg1.jpg" alt="predicted12" style="zoom:40%;" >
-<figcaption>MaskRCNN with pretrained model: Loss values for 10 epochs</figcaption>
+<img src="./selfattentionimages/overall_loss.JPG" alt="predicted13" style="zoom:20%;" >
+<img src="./selfattentionimages/loss_classifier.JPG" alt="predicted14" style="zoom:20%;" >
+<img src="./selfattentionimages/loss_mask.JPG" alt="predicted15" style="zoom:20%;" >
+<img src="./selfattentionimages/loss_objectness.JPG" alt="predicted16" style="zoom:20%;" >
+<img src="./selfattentionimages/loss_rpn_box_reg.JPG" alt="predicted17" style="zoom:20%;" >
+<img src="./selfattentionimages/loss_box_reg.JPG" alt="predicted18" style="zoom:20%;" >
+<figcaption>MaskRCNN model with Self Attention layer: Loss values for 10 epochs</figcaption>
 </figure>
+
+As can be seen from the total loss graph (loss), the loss value increases from 1 epoch to 6 epochs, after which it reaches a local minimum at 9 epochs. The maskrcnn_classifier_loss follows a similar trend. The maskrcnn_mask_loss and rpn_class_loss (objectness loss) values show a general decreasing trend. The rpn_bbox_loss and  mrcnn_bbox_loss (loss_box_reg) show a genral fluctuating trend. 
+
+### Effect of pretraining
+Overall, the loss values obtained for the pretrained model are lower and fluctuate less than those for the model trained from scratch. The pretrained model also does not require running for more than 10 epochs to achieve comparable loss values compared to the model trained from scratch.
+### Effect of self attention
+The model with self attention trained from scratch begins to show decreasing total loss (loss) values after 6 epochs, in comparison with the model without self attention which requires running for at least 10 epochs. The objectness loss also shows a general decreasing trend in comparison with the model trained from scratch without self attention which shows a more fluctuating trend. The mrcnnn_bbox_loss also does not show an increasing trend, unlike in the model without self attention.
 
 
 ### AP scores
