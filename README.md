@@ -454,6 +454,15 @@ With the pretrained model from coco dataset 2017, We trained the images for 30 e
   <figcaption>MaskRCNN with pretrained model: Loss values for 10 epochs</figcaption>
 </figure>
 
+<figure align="center">
+<img src="./selfattentionimages/overall_loss.JPG" alt="predicted13" style="zoom:40%;" >
+<img src="./images/pretrainedtrue/loss_classifier.JPG" alt="predicted14" style="zoom:40%;" >
+<img src="./images/pretrainedtrue/loss_mask.JPG" alt="predicted15" style="zoom:40%;" >
+<img src="./images/pretrainedtrue/loss_objectness.JPG" alt="predicted16" style="zoom:40%;" >
+<img src="./images/pretrainedtrue/loss_rpn_box_reg.JPG" alt="predicted17" style="zoom:40%;" >
+<img src="./images/pretrainedtrue/loss_box_reg.JPG" alt="predicted18" style="zoom:40%;" >
+<figcaption>MaskRCNN model with Self Attention layer: Loss values for 10 epochs</figcaption>
+</figure>
 
 <figure align="center">
 <img src="./images/resnetbacknopretr/loss_value.jpg" alt="predicted1" style="zoom:40%;" >
