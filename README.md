@@ -186,7 +186,7 @@ loss = abs(d) — 1/(2*sigma**2)
 
 In case of classifications the cross entropy loss is used for both rpn and rcnn.
 
-During training, different losses are computed and are: loss, rpn_class_loss, rpn_bbox_loss, mrcnn_class_loss, mrcnn_bbox_loss and mrcnn_mask_loss. loss is the summation of the other 5 loss values. The classification losses reflect the model's confidence in predicting the true class. mrcnn_class_loss is a cross-entropy loss computed for all instances in an image. rpn_class_loss is computed based on whether the generated anchors belong to the background or foreground. The bounding box losses reflect how close the true box parameters are from the predicted boxes. In the case of rpn_bbox_loss, the loss value indicates the ability of the model to locate objects within an image. In the case of mrcnn_bbox_loss, the loss indicates the ability of the model to precisely fit the bounding boxes around objects detected in the image. The mrcnn_mask_loss is a binary cross-entropy loss. A binary mask is generated for each bounding box and the loss is computed by comparing the ground truth binary mask for the true class with that for the generated binary mask for the same class. The loss indicates the ability of the model to generate a mask that falls over only those pixels which belong to the instance in the foreground. 
+During training, different losses are computed and are: **loss**, **rpn_class_loss**, **rpn_bbox_loss**, **mrcnn_class_loss**, **mrcnn_bbox_loss** and **mrcnn_mask_loss**. loss is the summation of the other 5 loss values. The classification losses reflect the model's confidence in predicting the true class. mrcnn_class_loss is a cross-entropy loss computed for all instances in an image. rpn_class_loss is computed based on whether the generated anchors belong to the background or foreground. The bounding box losses reflect how close the true box parameters are from the predicted boxes. In the case of rpn_bbox_loss, the loss value indicates the ability of the model to locate objects within an image. In the case of mrcnn_bbox_loss, the loss indicates the ability of the model to precisely fit the bounding boxes around objects detected in the image. The mrcnn_mask_loss is a binary cross-entropy loss. A binary mask is generated for each bounding box and the loss is computed by comparing the ground truth binary mask for the true class with that for the generated binary mask for the same class. The loss indicates the ability of the model to generate a mask that falls over only those pixels which belong to the instance in the foreground. 
 
 
 ## Dataset Description
@@ -463,6 +463,7 @@ With the pretrained model from coco dataset 2017, We trained the images for 30 e
 <img src="./selfattentionimages/loss_box_reg.JPG" alt="predicted18" style="zoom:20%;" >
 <figcaption>MaskRCNN model with Self Attention layer: Loss values for 10 epochs</figcaption>
 </figure>
+As can be seen from the total loss graph, the loss value increases from 1 epoch to 6 epochs, after which it reaches a minimum at 9 epochs. The maskrcnn_classifier_loss follows a similar trend. The maskrcnn_mask_loss and maskrcnn_bbox_loss (objectness loss) values show a general decreasing trend. 
 
 <figure align="center">
 <img src="./images/resnetbacknopretr/loss_value.jpg" alt="predicted1" style="zoom:40%;" >
@@ -483,6 +484,15 @@ With the pretrained model from coco dataset 2017, We trained the images for 30 e
 <img src="./images/pretrainedtrue/lossboxreg1.jpg" alt="predicted12" style="zoom:40%;" >
 <figcaption>MaskRCNN with pretrained model: Loss values for 10 epochs</figcaption>
 </figure>
+
+
+### AP scores
+|     Model                      |  AP<sup>bb</sup> | AP<sub>50</sub><sup>bb</sup> | AP<sub>75</sub><sup>bb</sup> |  AP<sup>seg</sup> | AP<sub>50</sub><sup>seg</sup> | AP<sub>75</sub><sup>seg</sup> |
+|------------------------------------------|-------|------|------|-------|-------|-------|
+| Pretrained mask-rcnn (10 epochs)         | 18.9  | 33.0 | 17.1 | 15.0  | 31.5  |  11.4 |
+| mask-rcnn from scratch (20 epochs)       | 1.0   | 3.2  |  0.1 |  0.7  |  2.4  |  0.1  |
+| mask-rcnn from scratch (10 epochs)       | 1.0   | 3.2  |  0.1 |  0.7  |  2.4  |  0.1  |
+| mask-rcnn with self attention (10 epochs)| 0.8   | 2.8  |  0.1 |  0.6  | 1.9   |  0.0  |
 
 ## Future Work
 A third proposed experiment would be to investigate the effect of the position of the attention convolutions within the resnet model. For example, the model could be investigated with attention convolutions in only one of the 4 resnet layers at a time. Also, the replacing the initial layers (the stem) with an Attention stem can be investigated. This experiment was not performed due to GPU memory constraints in colab. An attempt was made at adding attention bottlenecks in layers 2,3 and 4. It was observed in layers 2 and 3 that the attention convolutions would result in exceeding GPU limits available. This is expected since the original resnet implementation creates 4 and 6 bottlenecks in each of those layers respectively. A similar observation was made for replacement of the stem with an attention stem. An attention bottleneck implemented in layer 4 would result in large loss values.
