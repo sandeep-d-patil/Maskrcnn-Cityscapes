@@ -1,20 +1,19 @@
 # **Mask RCNN - with Cityscapes Dataset**
 
-## Introduction
-Mask RCNN is a state of the art instance segmentation network, which focuses on pixel level classification and outputs the bounding boxes, classes and masks. 
-Self Attention is a attention mechanism which relates different positions of the same image in order to compute/learn the representation of the image [ref](https://lilianweng.github.io/lil-log/2018/06/24/attention-attention.html#self-attention). 
 
-To investigate the improvement in accuracy of a Mask-RCNN model trained on Cityscapes dataset with the addition of self-attention layers for the task of instance segmentation.
+Authors: Mohamed Madi () Sandeep Patil(4861213) - s.patil-1@student.tudelft.nl
+## Introduction
+Mask RCNN is a state of the art instance segmentation network, which focuses on pixel level classification and outputs the bounding boxes, classes and masks. To reduce the number of parameters and to improve the efficiency of the network we introduce the self attention layer to the Mask RCNN network. Self Attention is a attention mechanism which relates different positions of the same image in order to compute/learn the representation of the image [REF](https://lilianweng.github.io/lil-log/2018/06/24/attention-attention.html#self-attention). We investigate the improvement in the accuracy of a Mask-RCNN model trained on Cityscapes dataset with the addition of self-attention layers for the task of instance segmentation.
 
 ### Mask RCNN Description
 
-The backbone is responsible for extracting features from the input images. The backbones that can be implemented in Mask RCNN include ResNet 50, FPN or ResNext 101 [[Kaiming et al.](https://arxiv.org/pdf/1703.06870.pdf)]. The features output from the backbone are taken as input in the head, which is composed of two stages. In the first stage, RPN or Region Proposal network scans the output of the backbone layer and it proposes anchor boxes which are bounding boxes with predefined locations and scales relative to images. At the second stage, the neural network scans these region proposed areas and generates object classes, bounding boxes and masks. This stage is called ROI Align. [[LINK](https://medium.com/@alittlepain833/simple-understanding-of-mask-rcnn-134b5b330e95#:~:text=Mask%20RCNN%20is%20a%20deep,two%20stages%20of%20Mask%20RCNN.)]
+Mask RCNN comprises of two stages, the first stage deals with the region proposals, which scans the feature pyramid network (FPN) (discussed in detail in further sections) and proposes regions which contain the object. Once the features are obtaineed in this stage they are confined to their respective positions in the image throught the Anchor Boxes. Anchors are set of boxes which have predefined locations and sizes on the image. The classes and bouding boxes are assigned to these anchor boxes according to IOU(Intersection over Union) value. The region proposal network (RPN) uses the anchors to perform this task. The second stage takes the output of region proposal network and and calculates the bounding boxes, objectness scores and masks using ROIAlign[Georgia et al](https://arxiv.org/pdf/1703.06870.pdf). ROI Align extracts a small feature map from region of interest obtained from the first stage of the network. It uses bilinear interpolation to preserve the features from the input. Both of these stages obtain a set of input from the backbone layer directly. This setup is shown in the figure below [[REF](https://medium.com/@alittlepain833/simple-understanding-of-mask-rcnn-134b5b330e95#:~:text=Mask%20RCNN%20is%20a%20deep,two%20stages%20of%20Mask%20RCNN.)]. The backbone is responsible for extracting features from the input images. The backbones that can be implemented in Mask RCNN include ResNet 50, FPN or ResNext 101 [[Kaiming et al.](https://arxiv.org/pdf/1703.06870.pdf)]. The backbone architecture is discussed in the further section.
 
 <p align="center">
   <img src="./images/Screenshot from 2020-06-17 13-33-49.png" alt="architecture" style="zoom:40%;" >
 </p>
 
-The mask rcnn backbone currently used is ResNet 50, as it is adaptable to the addition of a self attention layer( which will be explained in later section) .
+The mask rcnn backbone currently used is ResNet 50 wiht FPN (Feature Pyramid Network), as it is adaptable to the addition of a self attention layer( which will be explained in later section) .
 
 ```
 model = torchvision.models.detection.maskrcnn_resnet50_fpn(pretrained=False)
