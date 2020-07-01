@@ -15,9 +15,10 @@ Mask RCNN comprises of two stages, the <b>first stage</b> deals with the region 
 
 The <b>second stage</b> takes the output of region proposal network and calculates the bounding boxes, objectness scores and masks using ROIAlign [[Georgia et al]](https://arxiv.org/pdf/1703.06870.pdf). ROI Align extracts a small feature map from region of interest obtained in the first stage of the network. It uses bilinear interpolation to preserve the features from the input. Both of these stages obtain a set of input from the backbone layer directly. This setup is shown in the figure below [[REF](https://medium.com/@alittlepain833/simple-understanding-of-mask-rcnn-134b5b330e95#:~:text=Mask%20RCNN%20is%20a%20deep,two%20stages%20of%20Mask%20RCNN.)]. The backbone is responsible for extracting features from the input images. The backbones that can be implemented in Mask RCNN include ResNet 50, FPN or ResNext 101 [[Kaiming et al.](https://arxiv.org/pdf/1703.06870.pdf)]. The backbone architecture is discussed in the further section.
 
-<p align="center">
+<figure align="center">
   <img src="./images/Screenshot from 2020-06-17 13-33-49.png" alt="architecture" style="zoom:60%;">
-</p>
+	<figcaption>Model of Mask RCNN</figcaption>
+</figure>
 
 The mask rcnn backbone currently used is ResNet 50 with FPN (Feature Pyramid Network), as it is adaptable to the addition of a self attention layer.
 
@@ -62,9 +63,10 @@ The layers of ResNet architectures are shown in the diagram below. The bottlenec
 
 FPN uses a top down architecture with lateral connections to build a feature pyramid from a single scale input as shown in the figure below [ref](https://github.com/mapbox/robosat/issues/60). How is the experience while typing on the laptop keyboard. I would say it is vey pleasant while the key press is not that hard. It makes a alarming bang sound when typing , This might cause it to break . Hence need to proceed to typing on the other kkeybaords.
 
-<p align="center">
+<figure align="center">
   <img width="640" height="480" src="./images/resnetwithfpn.jpg" alt="SelfAttention" >
-</p>
+	<figcaption>ResNet with FPN</figcaption>
+</figure>
 
 ### Self Attention
 Self attention [[Ashish](https://arxiv.org/pdf/1706.03762.pdf )] [[Prajit](https://arxiv.org/pdf/1906.05909.pdf)] is a type of attention mechanism that relates different input pixel positions to learn a representation of the input sequence. Given a pixel x<sub>ij</sub>, a memory block is generated which is composed of pixels in positions ab that are in the neighborhood of the pixel x<sub>ij</sub>. The following formula is used to compute the pixel output.
@@ -75,16 +77,18 @@ Self attention [[Ashish](https://arxiv.org/pdf/1706.03762.pdf )] [[Prajit](https
 
 Where q<sub>ij</sub>, k<sub>ab</sub> and v<sub>ab</sub> correspond to queries, keys and values respectively. These values are obtained by transformation learned weight matrices W<sub>Q</sub>, W<sub>K</sub> and W<sub>V</sub>. This computation is done for every pixel value in the memory block. Multiple-attention heads are used where N weight matrices are learned for N groups of pixel features, by dividing the pixel features along the depth dimension. The output of every group or head is then concatenated to produce the final output. Figure x shows an example of the computation performed by a local attention layer.
 
-<p align="center">
+<figure align="center">
   <img src="./images/Screenshot from 2020-06-17 13-09-00.png" alt="SelfAttention" style="zoom:60%;" >
-</p>
+	<figcaption>Example of local attention layer over spatial extent of k=3</figcaption>
+</figure>
 
 
 A local attention layer with kernel size 3. Figure by [Prajit] To encode positional information relative attention is used. The relative distance between pixels in the neighborhood of (i,j) and pixel (i,j) is computed in terms of row and column offsets. An example of relative distance computations is shown in Figure x.
 
-<p align="center">
+<figure align="center">
   <img src="./images/Screenshot from 2020-06-17 13-09-21.png" alt="Pixels" style="zoom:60%;" >
-</p>
+	<figcaption>Example of relative distance computation</figcaption>
+</figure>
 
 Relative distance computation in row and column offsets, relative to the highlighted pixel. Figure by [Prajit]
 
@@ -186,10 +190,11 @@ During training, different losses are computed and are: loss, rpn_class_loss, rp
 
 Cityscapes [[Cordts et. al](https://arxiv.org/abs/1604.01685)] is a large-scale dataset and benchmarking tool that consists of images acquired of urban street scenes from a moving vehicle in 50 different cities with dense annotations for pixel-level, instance-level and panoptic labeling tasks. The dataset consists of 30 classes including person,car,bus,road and sky, of which only 10 classes are considered instances or traffic participants. The dataset consists of 5000 images with fine annotations and 20 000 images with course annotations. Of the 5000 images with fine annotations, 2975 images are assigned as train, 500 as validation and the remainder consists of test images with annotations withheld for benchmarking purposes. An example of a train image and its corresponding annotated label is shown in Figure 1.
 
-<p align="center">
+<figure align="center">
   <img src="./images/frankfurt_000001_027325_leftImg8bit.png" alt="Frankfurt" style="zoom:20%;" >
   <img src="./images/frankfurt_000001_027325_gtFine_color.png" alt="Frankfurt_gt" style="zoom:20%;">
-</p>
+	<figcaption>Image and masked image of a cityscapes dataset instance</figcaption>
+</figure>
 
 The target information is obtained from polygons in JSON files or InstanceId images that are provided with the dataset. In order to evaluate the and train a Mask-RCNN model with COCO evaluation metrics, the dataset must be loaded in the COCO annotation format for object detection and segmentation. This requires images and targets to be provided in the following format:
 
@@ -441,19 +446,21 @@ In our second experiment, we aim to investigate the effect of replacing the 3x3 
 
 ## Results
 With the pretrained model from coco dataset 2017, We trained the images for 30 epochs and the predicted mask can be seen below:
-<p align="center">
+<figure align="center">
   <img src="./images/dataset1.png" alt="predicted" style="zoom:40%;" >
-</p>
+  <figcaption>MaskRCNN with pretrained model: Loss values for 10 epochs</figcaption>
+</figure>
 
 
-<p align="center">
+<figure align="center">
 <img src="./images/resnetbacknopretr/loss_value.jpg" alt="predicted1" style="zoom:40%;" >
 <img src="./images/resnetbacknopretr/loss_class.jpg" alt="predicted2" style="zoom:40%;" >
 <img src="./images/resnetbacknopretr/loss_mask.jpg" alt="predicted3" style="zoom:40%;" >
 <img src="./images/resnetbacknopretr/loss_objectness.jpg" alt="predicted4" style="zoom:40%;" >
 <img src="./images/resnetbacknopretr/loss_rpn_box_reg.jpg" alt="predicted5" style="zoom:40%;" >
 <img src="./images/resnetbacknopretr/loss_box_reg.jpg" alt="predicted6" style="zoom:40%;" >
-</p>
+<figcaption>MaskRCNN without pretrained model: Loss values for 17 epochs</figcaption>
+</figure>
 
 <figure align="center">
 <img src="./images/pretrainedtrue/lossvalue1.jpg" alt="predicted7" style="zoom:40%;" >
@@ -462,7 +469,7 @@ With the pretrained model from coco dataset 2017, We trained the images for 30 e
 <img src="./images/pretrainedtrue/lossobject1.jpg" alt="predicted10" style="zoom:40%;" >
 <img src="./images/pretrainedtrue/lossrpnboxreg1.jpg" alt="predicted11" style="zoom:40%;" >
 <img src="./images/pretrainedtrue/lossboxreg1.jpg" alt="predicted12" style="zoom:40%;" >
-<figcaption>Loss values for 1 epochs</figcaption>
+<figcaption>MaskRCNN with pretrained model: Loss values for 10 epochs</figcaption>
 </figure>
 
 ## Future Work
