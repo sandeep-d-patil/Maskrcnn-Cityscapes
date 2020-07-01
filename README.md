@@ -455,7 +455,7 @@ With the pretrained model from coco dataset 2017, We trained the images for 30 e
 <img src="./images/resnetbacknopretr/loss_box_reg.jpg" alt="predicted6" style="zoom:40%;" >
 </p>
 
-<p align="center">
+<figure align="center">
 <img src="./images/pretrainedtrue/lossvalue1.jpg" alt="predicted7" style="zoom:40%;" >
 <img src="./images/pretrainedtrue/lossclass1.jpg" alt="predicted8" style="zoom:40%;" >
 <img src="./images/pretrainedtrue/lossmask1.jpg" alt="predicted9" style="zoom:40%;" >
@@ -463,7 +463,7 @@ With the pretrained model from coco dataset 2017, We trained the images for 30 e
 <img src="./images/pretrainedtrue/lossrpnboxreg1.jpg" alt="predicted11" style="zoom:40%;" >
 <img src="./images/pretrainedtrue/lossboxreg1.jpg" alt="predicted12" style="zoom:40%;" >
 <figcaption>Loss values for 10 epochs</figcaption>
-</p>
+</figure>
 
 ## Future Work
 A third proposed experiment would be to investigate the effect of the position of the attention convolutions within the resnet model. For example, the model could be investigated with attention convolutions in only one of the 4 resnet layers at a time. Also, the replacing the initial layers (the stem) with an Attention stem can be investigated. This experiment was not performed due to GPU memory constraints in colab. An attempt was made at adding attention bottlenecks in layers 2,3 and 4. It was observed in layers 2 and 3 that the attention convolutions would result in exceeding GPU limits available. This is expected since the original resnet implementation creates 4 and 6 bottlenecks in each of those layers respectively. A similar observation was made for replacement of the stem with an attention stem. An attention bottleneck implemented in layer 4 would result in large loss values.
