@@ -97,7 +97,7 @@ Here the inputs <b>width</b> refer to `int(planes * (base_width / 64.)) * groups
 
 ##
 | Model                          |                     bounding box             |                      segmentation            |
-|                                |  AP %| AP<sub>50</sub> % | AP<sub>75</sub> % |  AP %| AP<sub>50</sub> % | AP<sub>75</sub> % |
+|                                |  AP %| AP<sub>50</sub><sup>bb</sup> % | AP<sub>75</sub><sup>bb</sup> % |  AP %| AP<sub>50</sub> % | AP<sub>75</sub> % |
 |--------------------------------|---|---|---|---|---|---|
 | Pretrained mask-rcnn           |   |   |   |   |   |   |
 | mask-rcnn from scratch         |   |   |   |   |   |   |
