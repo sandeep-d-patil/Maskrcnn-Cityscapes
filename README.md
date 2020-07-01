@@ -71,8 +71,9 @@ FPN uses a top down architecture with lateral connections to build a feature pyr
 #### Self Attention
 Self attention [[Ashish](https://arxiv.org/pdf/1706.03762.pdf )] [[Prajit](https://arxiv.org/pdf/1906.05909.pdf)] is a type of attention mechanism that relates different input pixel positions to learn a representation of the input sequence. Given a pixel x<sub>ij</sub>, a memory block is generated which is composed of pixels in positions ab that are in the neighborhood of the pixel x<sub>ij</sub>. The following formula is used to compute the pixel output.
 
-<img src="https://render.githubusercontent.com/render/math?math=y_{ij} = \sum_{a,b Nk(i,j)} softmax_{ab}(q^T_{ij} * k_{ab})*v_{ab}">
-
+<p align="center">
+   <img src="https://render.githubusercontent.com/render/math?math=y_{ij} = \sum_{a,b Nk(i,j)} softmax_{ab}(q^T_{ij} * k_{ab})*v_{ab}">
+</p>
 
 Where q<sub>ij</sub>, k<sub>ab</sub> and v<sub>ab</sub> correspond to queries, keys and values respectively. These values are obtained by transformation learned weight matrices W<sub>Q</sub>, W<sub>K</sub> and W<sub>V</sub>. This computation is done for every pixel value in the memory block. Multiple-attention heads are used where N weight matrices are learned for N groups of pixel features, by dividing the pixel features along the depth dimension. The output of every group or head is then concatenated to produce the final output. Figure x shows an example of the computation performed by a local attention layer.
 
@@ -91,7 +92,9 @@ Relative distance computation in row and column offsets, relative to the highlig
 
 The row and column offsets are associated with embeddings r<sub>a-i</sub> and r<sub>b-j</sub> respectively, These embeddings are concatenated and used to compute the output y<sub>ij</sub>.
 
+<p align="center">
 <img src="https://render.githubusercontent.com/render/math?math=y_{ij} = \sum_{a,b Nk(i,j)} softmax_{ab}(q^T_{ij} * k_{ab} %20 q^T_{ij} * r_{a-i,b-j})*v_{ab}" />
+</p>
 
 The logits used in the computation of the softmax contain information on content and position. The number of parameters in an attention block is independent of the size of the memory block. With convolutions, on the other hand, the parameter count grows quadratically with the size of the kernel.
 
@@ -188,10 +191,6 @@ Cityscapes [[Cordts et. al](https://arxiv.org/abs/1604.01685)] is a large-scale 
 <p align="center">
   <img src="./images/frankfurt_000001_027325_leftImg8bit.png" alt="Frankfurt" style="zoom:20%;" >
   <img src="./images/frankfurt_000001_027325_gtFine_color.png" alt="Frankfurt_gt" style="zoom:20%;">
-</p>
-
-<p align="center">
-  
 </p>
 
 The target information is obtained from polygons in JSON files or InstanceId images that are provided with the dataset. In order to evaluate the and train a Mask-RCNN model with COCO evaluation metrics, the dataset must be loaded in the COCO annotation format for object detection and segmentation. This requires images and targets to be provided in the following format:
