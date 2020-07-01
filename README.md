@@ -556,13 +556,13 @@ The model with self attention trained from scratch begins to show decreasing tot
 The AP values overall for both the bounding boxes and the segmentations are higher than for models pretrained from scratch. This is expected since the pre-trained model was initilized with weights after training on the COCO dataset and we have only trained our models from scratch on 500 images. The AP values obtained for the model trained with self attention show improvements over those trained without self attention from sratch for the same number of epochs. It can also be observed that to achieve comparable AP values, the mask-rcnn model without self attention requires running for 20 epochs compared to only 10 epochs for the model with self attention.
 
 <figure align="center">
-<img src="./images/masks/imgpretr.jpg" alt="predcted7" style="zoom:40%;" >
+<img src="./images/masks/imgpretr.jpg" alt="predcted7" style="zoom:50%;" >
 <img src="./images/masks/maskpretr.jpg" alt="prdicted8" style="zoom:40%;" >
-<img src="./images/masks/selfattenimage.jpg" alt="pedicted11" style="zoom:40%;" >
+<img src="./images/masks/selfattenimage.jpg" alt="pedicted11" style="zoom:50%;" >
 <img src="./images/masks/masknopretr.jpg" alt="prdicted10" style="zoom:40%;" >
-<img src="./images/masks/selfattenimage.jpg" alt="pedicted11" style="zoom:40%;" >
-<img src="./images/masks/selfattenmask.jpg" alt="predited12" style="zoom:40%;" >
-<figcaption>Visualization of masks from different experiments (1)</figcaption>
+<img src="./images/masks/selfattenimage.jpg" alt="pedicted11" style="zoom:50%;" >
+<img src="./images/masks/selfattenmask.jpg" alt="predited12" style="zoom:50%;" >
+<figcaption>Visualization of masks from different experiments (1)Mask RCNN with the pretrained model (2)Mask RCNN without pretrained model (3)Mask RCNN with Self-Attention Layer</figcaption>
 </figure>
 
 ## Conclusions
