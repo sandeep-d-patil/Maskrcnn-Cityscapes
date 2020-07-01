@@ -7,12 +7,12 @@ Mask RCNN is a state of the art instance segmentation network, which focuses on 
 
 ### Mask RCNN Description
 
-Mask RCNN comprises of two stages, the first stage deals with the region proposals, which scans the feature pyramid network (FPN) (discussed in detail in further sections) and proposes regions which containing the object. Once the features are obtained in this stage they are confined to their respective positions in the image through the Anchor Boxes. Anchor boxes are a set of boxes which have predefined locations and sizes on the image. The classes and bouding boxes are assigned to these anchor boxes according to IOU (Intersection over Union) value. This task is performed by the network called Region Proposal Network (RPN). 
+Mask RCNN comprises of two stages, the <b>first stage</b> deals with the region proposals, which scans the feature pyramid network (FPN) (discussed in detail in further sections) and proposes regions which containing the object. Once the features are obtained in this stage they are confined to their respective positions in the image through the Anchor Boxes. Anchor boxes are a set of boxes which have predefined locations and sizes on the image. The classes and bouding boxes are assigned to these anchor boxes according to IOU (Intersection over Union) value. This task is performed by the network called Region Proposal Network (RPN). 
 
-The second stage takes the output of region proposal network and calculates the bounding boxes, objectness scores and masks using ROIAlign [[Georgia et al]](https://arxiv.org/pdf/1703.06870.pdf). ROI Align extracts a small feature map from region of interest obtained in the first stage of the network. It uses bilinear interpolation to preserve the features from the input. Both of these stages obtain a set of input from the backbone layer directly. This setup is shown in the figure below [[REF](https://medium.com/@alittlepain833/simple-understanding-of-mask-rcnn-134b5b330e95#:~:text=Mask%20RCNN%20is%20a%20deep,two%20stages%20of%20Mask%20RCNN.)]. The backbone is responsible for extracting features from the input images. The backbones that can be implemented in Mask RCNN include ResNet 50, FPN or ResNext 101 [[Kaiming et al.](https://arxiv.org/pdf/1703.06870.pdf)]. The backbone architecture is discussed in the further section.
+The <b>second stage</b> takes the output of region proposal network and calculates the bounding boxes, objectness scores and masks using ROIAlign [[Georgia et al]](https://arxiv.org/pdf/1703.06870.pdf). ROI Align extracts a small feature map from region of interest obtained in the first stage of the network. It uses bilinear interpolation to preserve the features from the input. Both of these stages obtain a set of input from the backbone layer directly. This setup is shown in the figure below [[REF](https://medium.com/@alittlepain833/simple-understanding-of-mask-rcnn-134b5b330e95#:~:text=Mask%20RCNN%20is%20a%20deep,two%20stages%20of%20Mask%20RCNN.)]. The backbone is responsible for extracting features from the input images. The backbones that can be implemented in Mask RCNN include ResNet 50, FPN or ResNext 101 [[Kaiming et al.](https://arxiv.org/pdf/1703.06870.pdf)]. The backbone architecture is discussed in the further section.
 
 <p align="center">
-  <img src="./images/Screenshot from 2020-06-17 13-33-49.png" alt="architecture" style="zoom:60%;" >
+  <img src="./images/Screenshot from 2020-06-17 13-33-49.png" alt="architecture" style="zoom:60%;">
 </p>
 
 The mask rcnn backbone currently used is ResNet 50 with FPN (Feature Pyramid Network), as it is adaptable to the addition of a self attention layer.
@@ -28,7 +28,7 @@ in_features = model.roi_heads.box_predictor.cls_score.in_features
 ```
 
 
-After obtaining the anchor boxes, the region proposal network tries to tighten the centers of these boxes around the target. This is done through the process of bounding box regression. After the bounding boxes are obtained, the IOU (intersection over union) with the ground truth values is calculated and classification labels are assigned for such boxes. Box_predictor here is the module that takes the output of bounding boxes and returns the classification labels and distance between the ground truth center and predicted center which is called bounding box regression delta. This distance is then used to calculate the loss values for backpropagation. 
+`box_predictor` here is the module that takes the output of bounding boxes from first stage of network and returns the classification labels and distance between the ground truth center and predicted center which is called bounding box regression delta. This distance is then used to calculate the loss values for backpropagation. 
 
 The model takes in the input channels from the in_features and the num_classes which is provided specifically for datasets. For Cityscapes dataset, the number of classes = 11 including the background. These classes correspond to instances of interest (traffic participants). The FastRCNNPredictor provides the class scores and bounding box regression deltas over the predicted values.
 
@@ -50,11 +50,14 @@ model.roi_heads.mask_predictor = MaskRCNNPredictor(in_features_mask,
 ```
 
 This returns the masks for the predicted instances in the image.
+
+```losses
 rpn_class_loss = RPN anchor classifier loss
 rpn_bbox_loss = RPN bounding box loss graph
 mrcnn_class_loss = loss for the classifier head of Mask R-CNN
 mrcnn_bbox_loss = loss for Mask R-CNN bounding box refinement
 mrcnn_mask_loss
+```
 
 #### Resnet with FPN backbone
 Resnet, also known as Residual Networks [Kaiming et al](https://arxiv.org/pdf/1512.03385.pdf), are very helpful in learning the weights over long range neural networks and solves the problem of vanishing gradients. Deep neural networks are essential in capturing more information from the input images. The addition of the 'shortcut connections' where the input for a particular layer is concatenated with the output of the same layer. The shortcut connections perform the  This helps the network to optimize easily when compared to just a stack of layers. ResNet 50 layer is used as the backbone for the MaskRCNN considering its size and capabilities. 
