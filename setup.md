@@ -13,4 +13,4 @@ To run the Mask RCNN model without changing the self attention model. Run the fo
 Follow the instructions mentioned in the notebook to train the model with/without pretrained weights.
 
 To run the Mask RCNN model with changing a bottleneck layer 
-Copy the Code from ResNet model into the `torchvision.model.resnet.py` which can be found in the downloaded library and run the model.
+Copy the Code from [ResNet](https://github.com/sandeeprockstar/Maskrcnn-Cityscapes/blob/master/Resnet_layer.ipynb) model into the `torchvision.model.resnet.py` which can be found in the downloaded library and run the model.
