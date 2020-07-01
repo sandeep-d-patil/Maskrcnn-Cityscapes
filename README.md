@@ -12,7 +12,7 @@ Mask RCNN comprises of two stages, the first stage deals with the region proposa
 The second stage takes the output of region proposal network and calculates the bounding boxes, objectness scores and masks using ROIAlign [[Georgia et al]](https://arxiv.org/pdf/1703.06870.pdf). ROI Align extracts a small feature map from region of interest obtained in the first stage of the network. It uses bilinear interpolation to preserve the features from the input. Both of these stages obtain a set of input from the backbone layer directly. This setup is shown in the figure below [[REF](https://medium.com/@alittlepain833/simple-understanding-of-mask-rcnn-134b5b330e95#:~:text=Mask%20RCNN%20is%20a%20deep,two%20stages%20of%20Mask%20RCNN.)]. The backbone is responsible for extracting features from the input images. The backbones that can be implemented in Mask RCNN include ResNet 50, FPN or ResNext 101 [[Kaiming et al.](https://arxiv.org/pdf/1703.06870.pdf)]. The backbone architecture is discussed in the further section.
 
 <p align="center">
-  <img src="./images/Screenshot from 2020-06-17 13-33-49.png" alt="architecture" style="zoom:40%;" >
+  <img src="./images/Screenshot from 2020-06-17 13-33-49.png" alt="architecture" style="zoom:60%;" >
 </p>
 
 The mask rcnn backbone currently used is ResNet 50 with FPN (Feature Pyramid Network), as it is adaptable to the addition of a self attention layer.
