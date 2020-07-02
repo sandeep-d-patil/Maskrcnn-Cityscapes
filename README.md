@@ -3,7 +3,7 @@
 </h1>
 
 <h3 align="center">
-<b>Authors: Mohamed Madi Sandeep Patil - s.patil-1@student.tudelft.nl </b>
+<b>Authors: Mohamed Madi & Sandeep Patil - s.patil-1@student.tudelft.nl </b>
 </h3>
 
 ## Introduction
