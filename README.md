@@ -63,7 +63,7 @@ The layers of ResNet architectures are shown in the diagram below. The bottlenec
 
 FPN uses a top down architecture with lateral connections to build a feature pyramid from a single scale input as shown in the figure below [ref](https://github.com/mapbox/robosat/issues/60).
 
-<figure align="center">
+<figure align="center" >
   <img width="640" height="480" src="./images/resnetwithfpn.jpg" alt="SelfAttention" >
 	<figcaption>ResNet with FPN</figcaption>
 </figure>
