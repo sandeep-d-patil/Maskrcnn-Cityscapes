@@ -548,10 +548,10 @@ The model with self attention trained from scratch begins to show decreasing tot
     <td class="tg-c3ow">mask-rcnn from scratch (10 epochs)</td>
     <td class="tg-0lax">0.2</td>
     <td class="tg-c3ow">0.6</td>
-    <td class="tg-c3ow">0.00</td>
+    <td class="tg-c3ow">-</td>
     <td class="tg-c3ow">0.1</td>
     <td class="tg-c3ow">20.3</td>
-    <td class="tg-c3ow">0.00</td>
+    <td class="tg-c3ow">-</td>
   </tr>
   <tr>
     <td class="tg-c3ow">mask-rcnn with self attention (10epochs)</td>
@@ -598,7 +598,8 @@ Visualizations of masks for Mask RCNN model with Self-Attention Layer is shown a
 We conclude that pretraining on COCO dataset leads to improved AP values compared to training from scratch. We also observe that adding self-attention convolutions in the bottleneck layers in the first resnet layer leads to comparable AP scores achieved with fewer epochs.  
 
 ## Future Work
-A third proposed experiment would be to investigate the effect of the position of the attention convolutions within the resnet model. For example, the model could be investigated with attention convolutions in only one of the 4 resnet layers at a time. Also, the replacing the initial layers (the stem) with an Attention stem can be investigated. This experiment was not performed due to GPU memory constraints in colab. An attempt was made at adding attention bottlenecks in layers 2,3 and 4. It was observed in layers 2 and 3 that the attention convolutions would result in exceeding GPU limits available. This is expected since the original resnet implementation creates 4 and 6 bottlenecks in each of those layers respectively. A similar observation was made for replacement of the stem with an attention stem. An attention bottleneck implemented in layer 4 would result in large loss values.
+A third proposed experiment would be to investigate the effect of the position of the attention convolutions within the resnet model. For example, the model could be investigated with attention convolutions in only one of the 4 resnet layers at a time. Also, the replacing the initial layers (the stem) with an Attention stem can be investigated. This experiment was not performed due to GPU memory constraints in colab. An attempt was made at adding attention bottlenecks in layers 2,3 and 4. It was observed in layers 2 and 3 that the attention convolutions would result in exceeding GPU limits available. This is expected since the original resnet implementation creates 4 and 6 bottlenecks in each of those layers respectively. A similar observation was made for replacement of the stem with an attention stem. An attention bottleneck implemented in layer 4 would result in large loss values. 
+Note: Work still in progress with the training and evaluation.
 
 ## Threats to validity
 Images were filtered out in 2 stages. First, images with no instances were filtered out. This could negatively impact the performance achieved by the models since the model would benefit from images with no instances and would reduce false positives. The decision to filter out these images was made to prevent errors in training and evaluation with pycoco training and evaluation functions that would rely on the presence of bounding boxes.In a second filtering stage, images with bounding boxes with an area less than a minimum area were filtered out, with some images returning no bounding boxes. For these images, one instance in the images was returned with a binary mask of zeros, a label of 0, and an area that was set to 500 pixels. It remains unclear whether returned instance is accounted for in the loss functions since background pixels should in theory not be taken into account in the loss. It was found however that these values would allow for the loss values to converge in training and were thus used. For a future implemetation, the effect of these filter stages should be thoroughly investigated.
