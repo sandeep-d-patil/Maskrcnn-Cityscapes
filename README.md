@@ -1,5 +1,5 @@
 <h1 align="center">
-<b>Mask RCNN - with Cityscapes Dataset</b>
+<b>Introduction of Self-Attention Layer in Mask RCNN - with Cityscapes Dataset</b>
 </h1>
 
 <h3 align="center">
