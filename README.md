@@ -555,12 +555,12 @@ The model with self attention trained from scratch begins to show decreasing tot
   </tr>
   <tr>
     <td class="tg-c3ow">mask-rcnn with self attention (10epochs)</td>
-    <td class="tg-0lax">0.8</td>
-    <td class="tg-c3ow">2.8</td>
-    <td class="tg-c3ow">0.1</td>
-    <td class="tg-c3ow">0.6</td>
-    <td class="tg-c3ow">1.9</td>
-    <td class="tg-c3ow">0.0</td>
+    <td class="tg-0lax">1.0</td>
+    <td class="tg-c3ow">3.3</td>
+    <td class="tg-c3ow">0.4</td>
+    <td class="tg-c3ow">0.8</td>
+    <td class="tg-c3ow">1.4</td>
+    <td class="tg-c3ow">0.5</td>
   </tr>
 </tbody>
 </table>
