@@ -6,17 +6,17 @@
 <b>Authors: Sandeep Patil - s.patil-1@student.tudelft.nl & Mohamed Madi</b><br>
 </h3>
 <h4 align="center">
-Both authors made equal contribution towards the project
+(Both authors made equal contribution towards the project)
 </h4>
 
 ## Introduction
-Mask RCNN is a state of the art instance segmentation network, which focuses on pixel level classification and outputs bounding boxes, classes and masks. we introduce the self attention layer to the Mask RCNN network to reduce the total number of parameters and to improve the efficiency of the network. Self Attention is an attention mechanism which relates different positions in an image in order to learn spatial dependencies in the latent representations of an image [[REF]](https://lilianweng.github.io/lil-log/2018/06/24/attention-attention.html#self-attention). We investigate the improvement in the accuracy of a Mask-RCNN model trained on Cityscapes dataset with the addition of self-attention layers for the task of instance segmentation.
+Mask-RCNN is a state-of-the-art instance segmentation network, which focuses on pixel level classification and outputs bounding boxes, classes and masks. Self-attention is an attention mechanism which relates different positions in an image in order to learn spatial dependencies in the latent representations of an image [[1]](https://lilianweng.github.io/lil-log/2018/06/24/attention-attention.html#self-attention). We investigate the improvement in the accuracy of a Mask-RCNN model trained on Cityscapes dataset with the addition of self-attention layers for the task of instance segmentation. We also study the improvement in network due to reduction of total number of parameters based on its accuracy and efficieny. 
 
-## Mask RCNN Description
+## Mask-RCNN Description
 ### Overview
-Mask RCNN comprises of two stages. The <b>first stage</b> is a Region Proposal Network, which scans the output of feature pyramid network (FPN) (discussed in detail in further sections) and proposes Regions of Interest which proposed object locations. Regions of interest are defined on the output feature map of the FPN network in the form of Anchor boxes. Anchor boxes are chosen from a finite set of boxes with predefined sizes and locations.
+Mask RCNN comprises of two stages. <b>First stage</b> is a Region Proposal Network (RPN), which scans the output of Feature Pyramid Network (FPN)(backbone layer) and proposes Regions of Interest (ROI) with object locations. Regions of interest are defined on the output feature map of the FPN network in the form of Anchor boxes. Anchor boxes are chosen from a finite set of boxes with predefined sizes and locations.
 
-The <b>second stage</b> takes the output of region proposal network, refines the bounding boxes, outputs class labels generates masks using ROIAlign [[Georgia et al]](https://arxiv.org/pdf/1703.06870.pdf). ROI Align uses bilinear interpolation to preserve the features from the input. Both of these stages obtain a set of input from the backbone layer directly. This setup is shown in the figure below [[REF](https://medium.com/@alittlepain833/simple-understanding-of-mask-rcnn-134b5b330e95#:~:text=Mask%20RCNN%20is%20a%20deep,two%20stages%20of%20Mask%20RCNN.)]. The backbone is responsible for extracting features from the input images. The backbones that can be implemented in Mask RCNN include ResNet 50, FPN or ResNext 101 [[Kaiming et al.](https://arxiv.org/pdf/1703.06870.pdf)].
+<b>Second stage</b> processes the output of RPN by refining bounding boxes, outputing class labels and generating masks using ROIAlign [[2]](https://arxiv.org/pdf/1703.06870.pdf). ROI Align uses bilinear interpolation to preserve the features from the input. Both of these stages obtain a set of input from the backbone layer directly. This setup is shown in the figure below [[3](https://medium.com/@alittlepain833/simple-understanding-of-mask-rcnn-134b5b330e95#:~:text=Mask%20RCNN%20is%20a%20deep,two%20stages%20of%20Mask%20RCNN.)]. The backbone is responsible for extracting features from the input images. The backbones that can be implemented in Mask RCNN include ResNet 50, FPN or ResNext 101 [[2](https://arxiv.org/pdf/1703.06870.pdf)].
 
 <figure align="center">
   <img src="./images/Screenshot from 2020-06-17 13-33-49.png" alt="architecture" style="zoom:60%;">
@@ -29,16 +29,16 @@ The mask rcnn backbone used in our project is ResNet 50 with FPN (Feature Pyrami
 model = torchvision.models.detection.maskrcnn_resnet50_fpn(pretrained=False)
 ```
 
-The pretrained model when `pretrained=true` obtained here is pretrained on the COCO 2017 dataset. When `pretrained = True` only the last layer of the model will be fine-tuned to particular classes, otherwise, the whole model is fine-tuned. Different backbones can be loaded here. A custom backbone can also be created.
+The pretrained model when `pretrained=true` obtained here is pretrained on the COCO 2017 dataset. When `pretrained = True` only the last layer of the model will be fine-tuned to particular classes. Different backbones can be loaded here. A custom backbone can also be created.
 
 ```
 in_features = model.roi_heads.box_predictor.cls_score.in_features
 ```
 
 
-`box_predictor` is the module that takes the output of bounding boxes from first stage of network and returns the classification labels and distance between the ground truth center and predicted center which is called bounding box regression delta. This distance is then used to calculate the loss values for backpropagation. 
+`box_predictor` module processes the output of bounding boxes from first stage of network and returns the classification labels and distance between the ground truth center and predicted center which is called bounding box regression delta. This distance is then used to calculate the loss values for backpropagation. 
 
-The model takes in the input channels from the in_features and the num_classes which is provided specifically for the dataset used. For Cityscapes dataset, the number of classes = 11 including the background. These classes are for instances of traffic participants and do not include classes such as egomotion vehicle or sky. The FastRCNNPredictor provides the class scores and bounding box regression deltas over the predicted values.
+The model processes the input channels from `in_features` and `num_classes`. These values are specifically provided for the dataset used and for Cityscapes dataset, `num_classes = 11` including the background. These classes are for instances of traffic participants and do not include classes such as egomotion vehicle or sky. The FastRCNNPredictor provides the class scores and bounding box regression deltas over the predicted values.
 
 ```
 model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
@@ -607,4 +607,7 @@ Note: Work still in progress with the training and evaluation.
 ## Threats to validity
 Images were filtered out in 2 stages. First, images with no instances were filtered out. This could negatively impact the performance achieved by the models since the model would benefit from images with no instances and would reduce false positives. The decision to filter out these images was made to prevent errors in training and evaluation with pycoco training and evaluation functions that would rely on the presence of bounding boxes.In a second filtering stage, images with bounding boxes with an area less than a minimum area were filtered out, with some images returning no bounding boxes. For these images, one instance in the images was returned with a binary mask of zeros, a label of 0, and an area that was set to 500 pixels. It remains unclear whether returned instance is accounted for in the loss functions since background pixels should in theory not be taken into account in the loss. It was found however that these values would allow for the loss values to converge in training and were thus used. For a future implemetation, the effect of these filter stages should be thoroughly investigated.
 
-
+## REFERENCES
+[1] - https://lilianweng.github.io/lil-log/2018/06/24/attention-attention.html#self-attention
+[2] - He, Kaiming, et al. "Mask r-cnn." Proceedings of the IEEE international conference on computer vision. 2017.
+[3] - [Simple Understanding of Mask RCNN](https://alittlepain833.medium.com/simple-understanding-of-mask-rcnn-134b5b330e95#:~:text=Mask%20RCNN%20is%20a%20deep,two%20stages%20of%20Mask%20RCNN.)
