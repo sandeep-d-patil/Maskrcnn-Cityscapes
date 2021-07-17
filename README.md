@@ -86,14 +86,12 @@ Where q<sub>ij</sub>, k<sub>ab</sub> and v<sub>ab</sub> correspond to queries, k
 </figure>
 
 
-A local attention layer with kernel size 3. Figure by [Prajit] To encode positional information relative attention is used. The relative distance between pixels in the neighborhood of (i,j) and pixel (i,j) is computed in terms of row and column offsets. An example of relative distance computations is shown in Figure x.
+A local attention layer with kernel size 3.To encode positional information relative attention is used. The relative distance between pixels in the neighborhood of (i,j) and pixel (i,j) is computed in terms of row and column offsets. An example of relative distance computations is shown in figure below.
 
 <figure align="center">
   <img src="./images/Screenshot from 2020-06-17 13-09-21.png" alt="Pixels" style="zoom:60%;" >
 	<figcaption>Example of relative distance computation</figcaption>
 </figure>
-
-Relative distance computation in row and column offsets, relative to the highlighted pixel. Figure by [Prajit]
 
 The row and column offsets are associated with embeddings r<sub>a-i</sub> and r<sub>b-j</sub> respectively, These embeddings are concatenated and used to compute the output y<sub>ij</sub>.
 
